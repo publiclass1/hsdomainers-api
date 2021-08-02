@@ -27,3 +27,7 @@ export function generateAccessToken(userData: any) {
         expiresIn: '1y'
     })
 }
+
+export function getUserId(req: any) {
+    return BigInt(req.user.id)
+}
