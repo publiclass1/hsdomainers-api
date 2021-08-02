@@ -6,6 +6,8 @@ import { IncomingForm } from 'formidable'
 import { getUserId } from '../lib/jwt'
 import prismaClient from '../lib/primaClient'
 import toInteger from 'lodash/toInteger'
+import { Prisma } from '@prisma/client'
+import { toJson } from '../utils/util'
 const router = Router()
 
 
@@ -26,8 +28,8 @@ router.get('/', async function (req, res) {
             where: {
                 userId: getUserId(req)
             },
-            take: limit,
-            skip: (limit * (page - 1)),
+            take: toInteger(limit),
+            skip: (toInteger(limit) * (toInteger(page) - 1)),
             orderBy: {
                 id: 'asc'
             }
@@ -97,11 +99,100 @@ router.post('/import', async (req, res) => {
     })
 })
 
-router.post('/:id', async (req, res) => {
+router.post('/', async function (req, res) {
+    const { name, ...restData } = req.body as any
 
-    res.json({
-        params: req.params
-    })
+    try {
+        const count = await prismaClient.domain.count({
+            where: {
+                name,
+                userId: getUserId(req)
+            }
+        })
+        if (count) {
+            return res.json({
+                errors: {
+                    name: 'Already exists'
+                }
+            })
+        }
+
+        const domain = await prismaClient.domain.create({
+            data: {
+                name,
+                ...restData,
+                dnsStatus: 'PENDING',
+                nameLength: name.length,
+                hasHypen: name.includes('-'),
+                hasNumber: /^\d+$/.test(name),
+                extension: name.split('.')?.pop() || '',
+                userId: getUserId(req),
+            }
+        })
+
+        res.json(serialize(domain).json)
+    } catch (e) {
+        console.log(e)
+        res.sendStatus(503)
+    }
+})
+
+
+router.patch('/:id', async (req, res) => {
+    const id = BigInt(req.params.id)
+    const data = req.body as Prisma.DomainCreateInput
+
+    try {
+        const domain = await prismaClient.domain.findFirst({
+            where: {
+                id,
+                userId: getUserId(req)
+            }
+        })
+        if (!domain) {
+            return res.sendStatus(404)
+        }
+
+        await prismaClient.domain.update({
+            where: { id: domain.id },
+            data: {
+                ...data
+            }
+        })
+        res.sendStatus(202)
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(422)
+    }
+
+
+})
+
+
+router.delete('/:id', async (req, res) => {
+    const id = BigInt(req.params.id)
+    const data = req.body as Prisma.DomainCreateInput
+
+    try {
+        const domain = await prismaClient.domain.findFirst({
+            where: {
+                id,
+                userId: getUserId(req)
+            }
+        })
+        if (!domain) {
+            return res.sendStatus(404)
+        }
+
+        await prismaClient.domain.delete({
+            where: { id: domain.id },
+        })
+        res.sendStatus(204)
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(422)
+    }
+
 })
 
 export default router
