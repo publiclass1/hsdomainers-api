@@ -1,0 +1,195 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  name          String?    @db.VarChar(255)
+  email         String?    @unique
+  password      String?    @db.Text
+  emailVerified DateTime?  @map(name: "email_verified")
+  image         String?    @db.Text
+  about         String?    @db.Text
+  status        UserStatus @default(ACTIVE)
+  userType      UserType   @default(USER) @map(name: "user_type")
+  lastOnline    DateTime?  @map(name: "last_online")
+  createdAt     DateTime   @default(now()) @map(name: "created_at")
+  updatedAt     DateTime   @updatedAt @map(name: "updated_at")
+
+  domains Domain[]
+  Account Account[]
+  Session Session[]
+  @@map(name: "users")
+}
+
+enum UserType {
+  ADMIN
+  USER
+}
+
+model Domain {
+  id                BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  name              String           @unique
+  extension         String
+  nameLength        Int              @map(name: "name_length")
+  hasHypen          Boolean          @default(false) @map(name: "has_hypen")
+  hasNumber         Boolean          @default(false) @map(name: "has_number")
+  status            DomainStatus     @default(PRIVATE)
+  leasePrice        Float?           @map(name: "lease_price")
+  monthlyPrice      Float?           @map(name: "monthly_price")
+  minimumOfferPrice Float?           @map(name: "minimum_offer_price")
+  buynowPrice       Float?           @map(name: "buynow_price")
+  dnsStatus         DNSStatus        @default(PENDING) @map(name: "dns_status")
+  createdAt         DateTime         @default(now()) @map(name: "created_at")
+  updatedAt         DateTime         @updatedAt @map(name: "updated_at")
+  user              User             @relation(fields: [userId], references: [id])
+  userId            BigInt           @db.UnsignedBigInt
+  domainOrders      DomainOrder[]
+  domainAnalytics   DomainAnalytic[]
+  domainViewLogs    DomainViewLog[]
+
+  @@index([name], name: "name")
+  @@map("domains")
+}
+
+enum DNSStatus {
+  PENDING
+  ACTIVE
+  REMOVED
+  INACTIVE
+  DNS_ERROR
+}
+
+model DomainOffer {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  amount    Float    @default(0)
+  fullName  String?
+  email     String?
+  contact   String?
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([email, fullName], name: "email_fullname")
+  @@map("domain_offers")
+}
+
+model DomainOrder {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  fullName  String?
+  email     String?
+  contact   String?
+  country   String?
+  city      String?
+  postalZip String?
+  address   String?
+  soldAt    DateTime?
+  amount    Float     @default(0)
+  domain    Domain    @relation(fields: [domainId], references: [id])
+  domainId  BigInt    @db.UnsignedBigInt
+  createdAt DateTime  @default(now()) @map(name: "created_at")
+  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+
+  @@map("domain_orders")
+}
+
+model DomainAnalytic {
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  views       Int      @default(0)
+  clicks      Int      @default(0)
+  uniqueViews Int      @default(0)
+  domain      Domain   @relation(fields: [domainId], references: [id])
+  domainId    BigInt   @db.UnsignedBigInt
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+  updatedAt   DateTime @updatedAt @map(name: "updated_at")
+
+  @@map("domain_analytics")
+}
+
+model DomainViewLog {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  data      Json?
+  ip        String?
+  browser   String?
+  eventType EventType @default(VIEW) @map("event_type")
+  domain    Domain    @relation(fields: [domainId], references: [id])
+  domainId  BigInt    @db.UnsignedBigInt
+  createdAt DateTime  @default(now()) @map(name: "created_at")
+  updatedAt DateTime  @updatedAt @map(name: "updated_at")
+
+  @@index([ip], name: "ip")
+  @@map("domain_logs")
+}
+
+enum EventType {
+  CLICK
+  VIEW
+}
+
+enum DomainStatus {
+  FOR_SALE
+  SOLD
+  PRIVATE
+  INACTIVE
+  ACTIVE
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// Next auth
+
+model Account {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  compoundId         String    @unique @map(name: "compound_id")
+  user               User      @relation(fields: [userId], references: [id])
+  userId             BigInt    @map(name: "user_id") @db.UnsignedBigInt
+  providerType       String    @map(name: "provider_type")
+  providerId         String    @map(name: "provider_id")
+  providerAccountId  String    @map(name: "provider_account_id")
+  refreshToken       String?   @map(name: "refresh_token")
+  accessToken        String?   @map(name: "access_token")
+  accessTokenExpires DateTime? @map(name: "access_token_expires")
+  createdAt          DateTime  @default(now()) @map(name: "created_at")
+  updatedAt          DateTime  @default(now()) @map(name: "updated_at")
+
+
+  @@index([providerAccountId], name: "providerAccountId")
+  @@index([providerId], name: "providerId")
+  @@index([userId], name: "userId")
+  @@map(name: "accounts")
+}
+
+model Session {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  user         User     @relation(fields: [userId], references: [id])
+  userId       BigInt   @map(name: "user_id") @db.UnsignedBigInt
+  expires      DateTime
+  sessionToken String   @unique @map(name: "session_token")
+  accessToken  String   @unique @map(name: "access_token")
+  createdAt    DateTime @default(now()) @map(name: "created_at")
+  updatedAt    DateTime @default(now()) @map(name: "updated_at")
+
+  @@map(name: "sessions")
+}
+
+model VerificationRequest {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
+  @@map(name: "verification_requests")
+}
