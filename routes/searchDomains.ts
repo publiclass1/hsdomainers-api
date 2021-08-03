@@ -9,11 +9,15 @@ router.get('/:name', async function (req, res) {
   const domain = await prismaClient.domain.findFirst({
     where: {
       name: name,
-      status: {
-        notIn: ['INACTIVE', 'PRIVATE']
-      }
+      // status: {
+      //   notIn: ['INACTIVE', 'PRIVATE']
+      // }
+    },
+    include: {
+      user: true
     }
   })
+  // console.log(name, domain)
   if (domain) {
     res.json(serialize(domain).json)
   } else {
