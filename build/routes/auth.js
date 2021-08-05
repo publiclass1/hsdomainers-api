@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const superjson_1 = require("superjson");
 const bcrypt_1 = require("bcrypt");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const jwt_1 = require("../lib/jwt");
@@ -20,19 +21,28 @@ const router = express_1.Router();
 router.post('/login', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { email, password } = req.body;
-        const user = yield primaClient_1.default.user.findUnique({
-            where: {
-                email: email,
-            }
-        });
-        if (user && bcrypt_1.compareSync(password, user.password || '')) {
-            delete user.password;
-            res.json({
-                token: jwt_1.generateAccessToken(user)
+        console.log(req.body);
+        try {
+            const user = yield primaClient_1.default.user.findUnique({
+                where: {
+                    email: email,
+                }
             });
+            if (user && bcrypt_1.compareSync(password, user.password || '')) {
+                delete user.password;
+                const serialedUser = superjson_1.serialize(user).json;
+                res.json({
+                    token: jwt_1.generateAccessToken(serialedUser),
+                    user: serialedUser
+                });
+            }
+            else {
+                return res.sendStatus(401);
+            }
         }
-        else {
-            return res.sendStatus(401);
+        catch (e) {
+            console.log(e);
+            res.sendStatus(503);
         }
     });
 });

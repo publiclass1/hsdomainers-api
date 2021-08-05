@@ -7,6 +7,7 @@ import { getUserId } from '../lib/jwt'
 import prismaClient from '../lib/primaClient'
 import toInteger from 'lodash/toInteger'
 import { Prisma } from '@prisma/client'
+import { toNumbers } from '../utils/util'
 const router = Router()
 
 
@@ -41,6 +42,27 @@ router.get('/', async function (req, res) {
       data: serialize(domains).json,
       total
     })
+  } catch (e) {
+    console.log(e)
+    res.sendStatus(503)
+  }
+})
+
+
+router.get('/:name', async function (req, res) {
+  const { name } = req.params
+
+  try {
+    const domain = await prismaClient.domain.findUnique({
+      where: {
+        name
+      }
+    })
+    if (domain) {
+      res.json(serialize(domain).json)
+    } else {
+      res.sendStatus(404)
+    }
   } catch (e) {
     console.log(e)
     res.sendStatus(503)
@@ -103,7 +125,7 @@ router.post('/import', async (req, res) => {
 
 router.post('/', async function (req, res) {
   const { name, ...restData } = req.body as any
-
+  const parseData = toNumbers(restData)
   try {
     const count = await prismaClient.domain.count({
       where: {
@@ -122,7 +144,7 @@ router.post('/', async function (req, res) {
     const domain = await prismaClient.domain.create({
       data: {
         name,
-        ...restData,
+        ...parseData,
         dnsStatus: 'PENDING',
         nameLength: name.length,
         hasHypen: name.includes('-'),
@@ -143,7 +165,8 @@ router.post('/', async function (req, res) {
 router.patch('/:id', async (req, res) => {
   const id = BigInt(req.params.id)
   const data = req.body as Prisma.DomainCreateInput
-
+  const parseData = toNumbers(data)
+  console.log({ data, parseData })
   try {
     const domain = await prismaClient.domain.findFirst({
       where: {
@@ -158,7 +181,7 @@ router.patch('/:id', async (req, res) => {
     await prismaClient.domain.update({
       where: { id: domain.id },
       data: {
-        ...data
+        ...parseData
       }
     })
     res.sendStatus(202)

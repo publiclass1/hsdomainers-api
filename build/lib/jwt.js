@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateAccessToken = exports.jwtMiddleware = void 0;
+exports.getUserId = exports.generateAccessToken = exports.jwtMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const superjson_1 = require("superjson");
 const secret = process.env.JWT_SECRET;
@@ -31,3 +31,7 @@ function generateAccessToken(userData) {
     });
 }
 exports.generateAccessToken = generateAccessToken;
+function getUserId(req) {
+    return BigInt(req.user.id);
+}
+exports.getUserId = getUserId;
