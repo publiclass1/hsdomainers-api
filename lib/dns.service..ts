@@ -6,9 +6,9 @@ const TOKEN = process.env.DNS_API_TOKEN || 'intersnipe'
 export default class DNSServerAPIService {
 
   static async createRecord(domains: string[]) {
-    console.log('domains to create', toJson({
+    console.log('domains to create', {
       domains
-    }))
+    })
     try {
       const rs = await fetch(`${API_URL}/domains`, {
         method: 'POST',
@@ -17,8 +17,8 @@ export default class DNSServerAPIService {
           'accept': 'application/json',
           'x-token': TOKEN
         },
-        body: toJson({
-          domains
+        body: JSON.stringify({
+          domains: domains
         })
       })
       const resData = await rs.json()

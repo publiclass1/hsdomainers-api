@@ -13,15 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_fetch_1 = __importDefault(require("node-fetch"));
-const util_1 = require("../utils/util");
 const API_URL = process.env.DNS_API_SERVER || 'http://localhost.link:3001';
 const TOKEN = process.env.DNS_API_TOKEN || 'intersnipe';
 class DNSServerAPIService {
     static createRecord(domains) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('domains to create', util_1.toJson({
+            console.log('domains to create', {
                 domains
-            }));
+            });
             try {
                 const rs = yield node_fetch_1.default(`${API_URL}/domains`, {
                     method: 'POST',
@@ -30,8 +29,8 @@ class DNSServerAPIService {
                         'accept': 'application/json',
                         'x-token': TOKEN
                     },
-                    body: util_1.toJson({
-                        domains
+                    body: JSON.stringify({
+                        domains: domains
                     })
                 });
                 const resData = yield rs.json();
