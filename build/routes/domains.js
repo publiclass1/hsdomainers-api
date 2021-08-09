@@ -32,6 +32,7 @@ const jwt_1 = require("../lib/jwt");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const toInteger_1 = __importDefault(require("lodash/toInteger"));
 const util_1 = require("../utils/util");
+const values_1 = __importDefault(require("lodash/values"));
 const router = express_1.Router();
 router.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -88,6 +89,9 @@ router.get('/:name', function (req, res) {
         }
     });
 });
+/**
+ * Import domains via csv file
+ */
 router.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const data = yield new Promise((resolve, reject) => {
@@ -99,39 +103,34 @@ router.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     });
     const filepath = (_a = data === null || data === void 0 ? void 0 : data.files) === null || _a === void 0 ? void 0 : _a.file.path;
-    yield readCsvFile(filepath, (data) => __awaiter(void 0, void 0, void 0, function* () {
+    yield readCsvFile(filepath, (data = []) => __awaiter(void 0, void 0, void 0, function* () {
         var _b;
-        /**
-            {
-                name: 'goog.com',
-                lease_price: 'com',
-                buynow_price: '100',
-                monthly_price: '10',
-                minimum_offer_price: '20',
-            }
-        */
-        // console.log(data)
+        console.log(data);
+        const domainName = data === null || data === void 0 ? void 0 : data[0];
+        if (!domainName) {
+            return;
+        }
         try {
             let exists = yield primaClient_1.default.domain.findFirst({
                 where: {
-                    name: data.name,
+                    name: domainName,
                     userId: jwt_1.getUserId(req)
                 }
             });
             if (!exists) {
                 yield primaClient_1.default.domain.create({
                     data: {
-                        name: data.name,
-                        nameLength: data.name.length,
-                        hasHypen: data.name.includes('-'),
-                        hasNumber: /^\d+$/.test(data.name),
-                        extension: ((_b = data.name.split('.')) === null || _b === void 0 ? void 0 : _b.pop()) || '',
+                        name: domainName,
+                        nameLength: domainName.length,
+                        hasHypen: domainName.includes('-'),
+                        hasNumber: /^\d+$/.test(domainName),
+                        extension: ((_b = domainName.split('.')) === null || _b === void 0 ? void 0 : _b.pop()) || '',
                         userId: jwt_1.getUserId(req),
                         dnsStatus: 'PENDING',
-                        leasePrice: toInteger_1.default(data.lease_price),
-                        buynowPrice: toInteger_1.default(data.buynow_price),
-                        monthlyPrice: toInteger_1.default(data.monthly_price),
-                        minimumOfferPrice: toInteger_1.default(data.minimum_offer_price),
+                        leasePrice: 0,
+                        buynowPrice: 0,
+                        monthlyPrice: 0,
+                        minimumOfferPrice: 0,
                     }
                 });
             }
@@ -228,15 +227,20 @@ function readCsvFile(filepath, cb) {
     return __awaiter(this, void 0, void 0, function* () {
         const stream = fs_1.default.createReadStream(filepath);
         return yield new Promise((resolve) => {
-            stream.pipe(csvtojson_1.default())
+            stream.pipe(csvtojson_1.default({
+                alwaysSplitAtEOL: true,
+                checkColumn: false,
+                noheader: true,
+                flatKeys: true,
+            }))
                 .on('data', function (row) {
                 return __awaiter(this, void 0, void 0, function* () {
                     let domain = JSON.parse(row);
-                    if (!domain.name || !domain.name.includes('.')) {
+                    if (!domain) {
                         return null;
                     }
-                    console.log(domain);
-                    yield cb(domain);
+                    const objArray = values_1.default(domain);
+                    yield cb(objArray);
                 });
             })
                 .on('end', function () {
