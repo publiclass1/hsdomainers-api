@@ -8,6 +8,9 @@ import prismaClient from '../lib/primaClient'
 import toInteger from 'lodash/toInteger'
 import { Prisma } from '@prisma/client'
 import { toNumbers } from '../utils/util'
+import toObjectValues from 'lodash/values'
+import getValue from 'lodash/get'
+
 const router = Router()
 
 
@@ -69,6 +72,9 @@ router.get('/:name', async function (req, res) {
   }
 })
 
+/**
+ * Import domains via csv file
+ */
 router.post('/import', async (req, res) => {
   const data: any = await new Promise((resolve, reject) => {
     const form = new IncomingForm()
@@ -78,41 +84,35 @@ router.post('/import', async (req, res) => {
     })
   })
   const filepath = data?.files?.file.path
-  await readCsvFile(filepath, async (data: any) => {
-    /**
-        {
-            name: 'goog.com',
-            lease_price: 'com',
-            buynow_price: '100',
-            monthly_price: '10',
-            minimum_offer_price: '20',
-        }
-    */
-    // console.log(data)
+  await readCsvFile(filepath, async (data: string[] = []) => {
+    console.log(data)
+    const domainName = data?.[0];
+    if (!domainName) {
+      return
+    }
     try {
       let exists = await prismaClient.domain.findFirst({
         where: {
-          name: data.name,
+          name: domainName,
           userId: getUserId(req)
         }
       })
       if (!exists) {
         await prismaClient.domain.create({
           data: {
-            name: data.name,
-            nameLength: data.name.length,
-            hasHypen: data.name.includes('-'),
-            hasNumber: /^\d+$/.test(data.name),
-            extension: data.name.split('.')?.pop() || '',
+            name: domainName,
+            nameLength: domainName.length,
+            hasHypen: domainName.includes('-'),
+            hasNumber: /^\d+$/.test(domainName),
+            extension: domainName.split('.')?.pop() || '',
             userId: getUserId(req),
             dnsStatus: 'PENDING',
-            leasePrice: toInteger(data.lease_price),
-            buynowPrice: toInteger(data.buynow_price),
-            monthlyPrice: toInteger(data.monthly_price),
-            minimumOfferPrice: toInteger(data.minimum_offer_price),
+            leasePrice: 0,
+            buynowPrice: 0,
+            monthlyPrice: 0,
+            minimumOfferPrice: 0,
           }
         })
-
       }
     } catch (e) {
       console.log(e.message)
@@ -226,14 +226,19 @@ export default router
 async function readCsvFile(filepath: string, cb: Function) {
   const stream = fs.createReadStream(filepath)
   return await new Promise((resolve) => {
-    stream.pipe(csv())
+    stream.pipe(csv({
+      alwaysSplitAtEOL: true,
+      checkColumn: false,
+      noheader: true,
+      flatKeys: true,
+    }))
       .on('data', async function (row) {
         let domain = JSON.parse(row)
-        if (!domain.name || !domain.name.includes('.')) {
-          return null;
+        if (!domain) {
+          return null
         }
-        console.log(domain)
-        await cb(domain)
+        const objArray = toObjectValues(domain)
+        await cb(objArray)
       })
       .on('end', function () {
         console.log('Data loaded')
