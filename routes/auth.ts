@@ -12,7 +12,6 @@ router.post('/login', async function (req, res) {
     email,
     password
   } = req.body as any
-  console.log(req.body)
 
   try {
     const user: any = await prismaClient.user.findUnique({

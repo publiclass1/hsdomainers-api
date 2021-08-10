@@ -27,6 +27,7 @@ model User {
   domains Domain[]
   Account Account[]
   Session Session[]
+  Upload  Upload[]
   @@map(name: "users")
 }
 
@@ -52,6 +53,8 @@ model Domain {
   updatedAt         DateTime         @updatedAt @map(name: "updated_at")
   user              User             @relation(fields: [userId], references: [id])
   userId            BigInt           @db.UnsignedBigInt
+  upload            Upload           @relation(fields: [uploadId], references: [id])
+  uploadId          BigInt           @db.UnsignedBigInt
   domainOrders      DomainOrder[]
   domainAnalytics   DomainAnalytic[]
   domainViewLogs    DomainViewLog[]
@@ -126,6 +129,29 @@ model DomainViewLog {
 
   @@index([ip], name: "ip")
   @@map("domain_logs")
+}
+
+model Upload {
+  id         BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  type       UploadType @default(OTHER)
+  s3FileName String?    @map(name: "s3_file_name")
+  s3Link     String?    @map(name: "s3_link")
+  fileName   String     @map(name: "file_name")
+  extension  String
+  size       Int        @default(0)
+  createdAt  DateTime   @default(now()) @map(name: "created_at")
+  updatedAt  DateTime   @updatedAt @map(name: "updated_at")
+  user       User       @relation(fields: [userId], references: [id])
+  userId     BigInt     @db.UnsignedBigInt
+
+  Domain Domain[]
+}
+
+enum UploadType {
+  VIDEO
+  IMAGE
+  DOCS
+  OTHER
 }
 
 enum EventType {
