@@ -9,6 +9,7 @@ import domainAnalytics from './routes/domainAnalytics'
 import domainDNSRegistration from './routes/domainDNSRegistration'
 import authRoutes from './routes/auth'
 import userRoutes from './routes/user'
+import uploadRoutes from './routes/uploads'
 
 const app = express()
 const started = Date.now()
@@ -25,6 +26,7 @@ app.use('/domains/analytics', domainAnalytics)
 app.use('/domains/search', searchDomains)
 app.use('/domains', jwtMiddleware, domainRoutes)
 app.use('/users', jwtMiddleware, userRoutes)
+app.use('/uploads', jwtMiddleware, uploadRoutes)
 app.get('/', (req: Request, res: Response) => {
   res.json({
     upTime: new Date(Date.now() - started)

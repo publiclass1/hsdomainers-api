@@ -53,8 +53,8 @@ model Domain {
   updatedAt         DateTime         @updatedAt @map(name: "updated_at")
   user              User             @relation(fields: [userId], references: [id])
   userId            BigInt           @db.UnsignedBigInt
-  upload            Upload           @relation(fields: [uploadId], references: [id])
-  uploadId          BigInt           @db.UnsignedBigInt
+  upload            Upload?           @relation(fields: [uploadId], references: [id])
+  uploadId          BigInt?           @db.UnsignedBigInt
   domainOrders      DomainOrder[]
   domainAnalytics   DomainAnalytic[]
   domainViewLogs    DomainViewLog[]
@@ -143,8 +143,14 @@ model Upload {
   updatedAt  DateTime   @updatedAt @map(name: "updated_at")
   user       User       @relation(fields: [userId], references: [id])
   userId     BigInt     @db.UnsignedBigInt
+  status     UploadStatus @default(PENDING)
+  Domain     Domain[]
+}
 
-  Domain Domain[]
+enum UploadStatus {
+  PENDING
+  COMPLETED
+  INPROGRESS
 }
 
 enum UploadType {

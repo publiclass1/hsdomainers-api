@@ -8,7 +8,7 @@ export function jwtMiddleware(req: any, res: Response, next: CallableFunction) {
     const bearerHeaderToken = req.headers.authorization
     const token = bearerHeaderToken?.split(' ')
     if (!bearerHeaderToken || !token || token.length !== 2) {
-        return res.status(401).send('Forbidden')
+        return res.status(401).end()
     }
     const bearerToken = token[1]
     jwt.verify(bearerToken, secret, (e: any, payload: any) => {
