@@ -11,7 +11,7 @@ function jwtMiddleware(req, res, next) {
     const bearerHeaderToken = req.headers.authorization;
     const token = bearerHeaderToken === null || bearerHeaderToken === void 0 ? void 0 : bearerHeaderToken.split(' ');
     if (!bearerHeaderToken || !token || token.length !== 2) {
-        return res.status(401).send('Forbidden');
+        return res.status(401).end();
     }
     const bearerToken = token[1];
     jsonwebtoken_1.default.verify(bearerToken, secret, (e, payload) => {

@@ -12,14 +12,14 @@ router.post('/login', async function (req, res) {
     email,
     password
   } = req.body as any
-
+  console.log(email, password)
   try {
     const user: any = await prismaClient.user.findUnique({
       where: {
         email: email,
       }
     })
-
+    console.log(user)
     if (user && compareSync(password, user.password || '')) {
       delete user.password
       const serialedUser = serialize(user).json

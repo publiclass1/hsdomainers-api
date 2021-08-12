@@ -27,7 +27,8 @@ router.get('/:name', function (req, res) {
                 // }
             },
             include: {
-                user: true
+                user: true,
+                upload: true
             }
         });
         // console.log(name, domain)

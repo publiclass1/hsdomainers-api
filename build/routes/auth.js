@@ -21,13 +21,14 @@ const router = express_1.Router();
 router.post('/login', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { email, password } = req.body;
-        console.log(req.body);
+        console.log(email, password);
         try {
             const user = yield primaClient_1.default.user.findUnique({
                 where: {
                     email: email,
                 }
             });
+            console.log(user);
             if (user && bcrypt_1.compareSync(password, user.password || '')) {
                 delete user.password;
                 const serialedUser = superjson_1.serialize(user).json;
