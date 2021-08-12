@@ -14,7 +14,8 @@ router.get('/:name', async function (req, res) {
       // }
     },
     include: {
-      user: true
+      user: true,
+      upload: true
     }
   })
   // console.log(name, domain)

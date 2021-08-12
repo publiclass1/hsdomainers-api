@@ -53,8 +53,8 @@ model Domain {
   updatedAt         DateTime         @updatedAt @map(name: "updated_at")
   user              User             @relation(fields: [userId], references: [id])
   userId            BigInt           @db.UnsignedBigInt
-  upload            Upload?           @relation(fields: [uploadId], references: [id])
-  uploadId          BigInt?           @db.UnsignedBigInt
+  upload            Upload?          @relation(fields: [uploadId], references: [id])
+  uploadId          BigInt?          @db.UnsignedBigInt
   domainOrders      DomainOrder[]
   domainAnalytics   DomainAnalytic[]
   domainViewLogs    DomainViewLog[]
@@ -132,17 +132,17 @@ model DomainViewLog {
 }
 
 model Upload {
-  id         BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
-  type       UploadType @default(OTHER)
-  s3FileName String?    @map(name: "s3_file_name")
-  s3Link     String?    @map(name: "s3_link")
-  fileName   String     @map(name: "file_name")
+  id         BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  type       String?
+  s3FileName String?      @map(name: "s3_file_name")
+  s3Link     String?      @map(name: "s3_link")
+  fileName   String       @map(name: "file_name")
   extension  String
-  size       Int        @default(0)
-  createdAt  DateTime   @default(now()) @map(name: "created_at")
-  updatedAt  DateTime   @updatedAt @map(name: "updated_at")
-  user       User       @relation(fields: [userId], references: [id])
-  userId     BigInt     @db.UnsignedBigInt
+  size       Int          @default(0)
+  createdAt  DateTime     @default(now()) @map(name: "created_at")
+  updatedAt  DateTime     @updatedAt @map(name: "updated_at")
+  user       User         @relation(fields: [userId], references: [id])
+  userId     BigInt       @db.UnsignedBigInt
   status     UploadStatus @default(PENDING)
   Domain     Domain[]
 }
@@ -151,13 +151,6 @@ enum UploadStatus {
   PENDING
   COMPLETED
   INPROGRESS
-}
-
-enum UploadType {
-  VIDEO
-  IMAGE
-  DOCS
-  OTHER
 }
 
 enum EventType {
