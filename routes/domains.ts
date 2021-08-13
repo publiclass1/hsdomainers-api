@@ -15,6 +15,7 @@ const router = Router()
 
 
 router.get('/', async function (req, res) {
+  const userId = getUserId(req)
   const {
     limit = 25,
     page = 1,
@@ -24,12 +25,12 @@ router.get('/', async function (req, res) {
   try {
     const total = await prismaClient.domain.count({
       where: {
-        userId: getUserId(req)
+        userId
       }
     })
     const domains = await prismaClient.domain.findMany({
       where: {
-        userId: getUserId(req)
+        userId
       },
       include: {
         domainAnalytics: true
@@ -69,6 +70,18 @@ router.get('/:name', async function (req, res) {
   } catch (e) {
     console.log(e)
     res.sendStatus(503)
+  }
+})
+
+router.patch('/:id/pitch-video', async function (req, res) {
+  const { id } = req.params
+  const { uploadId } = req.body
+  if (!uploadId) {
+    return res.status(422).json({
+      error: {
+        uploadId: 'Upload is required.'
+      }
+    })
   }
 })
 

@@ -36,16 +36,17 @@ const values_1 = __importDefault(require("lodash/values"));
 const router = express_1.Router();
 router.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
+        const userId = jwt_1.getUserId(req);
         const { limit = 25, page = 1, order_by = 'id' } = req.query;
         try {
             const total = yield primaClient_1.default.domain.count({
                 where: {
-                    userId: jwt_1.getUserId(req)
+                    userId
                 }
             });
             const domains = yield primaClient_1.default.domain.findMany({
                 where: {
-                    userId: jwt_1.getUserId(req)
+                    userId
                 },
                 include: {
                     domainAnalytics: true
@@ -86,6 +87,19 @@ router.get('/:name', function (req, res) {
         catch (e) {
             console.log(e);
             res.sendStatus(503);
+        }
+    });
+});
+router.patch('/:id/pitch-video', function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { id } = req.params;
+        const { uploadId } = req.body;
+        if (!uploadId) {
+            return res.status(422).json({
+                error: {
+                    uploadId: 'Upload is required.'
+                }
+            });
         }
     });
 });
