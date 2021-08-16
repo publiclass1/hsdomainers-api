@@ -206,7 +206,7 @@ router.patch('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* (
             where: { id: domain.id },
             data: Object.assign({}, parseData)
         });
-        res.sendStatus(202);
+        res.json(superjson_1.serialize(domain).json);
     }
     catch (error) {
         console.log(error);
