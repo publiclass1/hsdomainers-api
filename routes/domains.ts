@@ -197,7 +197,7 @@ router.patch('/:id', async (req, res) => {
         ...parseData
       }
     })
-    res.sendStatus(202)
+    res.json(serialize(domain).json)
   } catch (error) {
     console.log(error)
     res.sendStatus(422)
