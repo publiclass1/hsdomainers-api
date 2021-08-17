@@ -37,27 +37,26 @@ enum UserType {
 }
 
 model Domain {
-  id                BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
-  name              String           @unique
+  id                BigInt             @id @default(autoincrement()) @db.UnsignedBigInt
+  name              String             @unique
   extension         String
-  nameLength        Int              @map(name: "name_length")
-  hasHypen          Boolean          @default(false) @map(name: "has_hypen")
-  hasNumber         Boolean          @default(false) @map(name: "has_number")
-  status            DomainStatus     @default(PRIVATE)
-  leasePrice        Float?           @map(name: "lease_price")
-  monthlyPrice      Float?           @map(name: "monthly_price")
-  minimumOfferPrice Float?           @map(name: "minimum_offer_price")
-  buynowPrice       Float?           @map(name: "buynow_price")
-  dnsStatus         DNSStatus        @default(PENDING) @map(name: "dns_status")
-  createdAt         DateTime         @default(now()) @map(name: "created_at")
-  updatedAt         DateTime         @updatedAt @map(name: "updated_at")
-  user              User             @relation(fields: [userId], references: [id])
-  userId            BigInt           @db.UnsignedBigInt
-  upload            Upload?          @relation(fields: [uploadId], references: [id])
-  uploadId          BigInt?          @db.UnsignedBigInt
+  nameLength        Int                @map(name: "name_length")
+  hasHypen          Boolean            @default(false) @map(name: "has_hypen")
+  hasNumber         Boolean            @default(false) @map(name: "has_number")
+  status            DomainStatus       @default(PRIVATE)
+  leasePrice        Float?             @map(name: "lease_price")
+  monthlyPrice      Float?             @map(name: "monthly_price")
+  minimumOfferPrice Float?             @map(name: "minimum_offer_price")
+  buynowPrice       Float?             @map(name: "buynow_price")
+  dnsStatus         DNSStatus          @default(PENDING) @map(name: "dns_status")
+  createdAt         DateTime           @default(now()) @map(name: "created_at")
+  updatedAt         DateTime           @updatedAt @map(name: "updated_at")
+  user              User               @relation(fields: [userId], references: [id])
+  userId            BigInt             @db.UnsignedBigInt
   domainOrders      DomainOrder[]
   domainAnalytics   DomainAnalytic[]
   domainViewLogs    DomainViewLog[]
+  domainPitchVideos DomainPitchVideo[]
 
   @@index([name], name: "name")
   @@map("domains")
@@ -131,20 +130,30 @@ model DomainViewLog {
   @@map("domain_logs")
 }
 
+model DomainPitchVideo {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  domain    Domain   @relation(fields: [domainId], references: [id])
+  domainId  BigInt   @db.UnsignedBigInt
+  upload    Upload   @relation(fields: [uploadId], references: [id])
+  uploadId  BigInt   @db.UnsignedBigInt
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+}
+
 model Upload {
-  id         BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
-  type       String?
-  s3FileName String?      @map(name: "s3_file_name")
-  s3Link     String?      @map(name: "s3_link")
-  fileName   String       @map(name: "file_name")
-  extension  String
-  size       Int          @default(0)
-  createdAt  DateTime     @default(now()) @map(name: "created_at")
-  updatedAt  DateTime     @updatedAt @map(name: "updated_at")
-  user       User         @relation(fields: [userId], references: [id])
-  userId     BigInt       @db.UnsignedBigInt
-  status     UploadStatus @default(PENDING)
-  Domain     Domain[]
+  id               BigInt             @id @default(autoincrement()) @db.UnsignedBigInt
+  type             String?
+  s3FileName       String?            @map(name: "s3_file_name")
+  s3Link           String?            @map(name: "s3_link")
+  fileName         String             @map(name: "file_name")
+  extension        String
+  size             Int                @default(0)
+  createdAt        DateTime           @default(now()) @map(name: "created_at")
+  updatedAt        DateTime           @updatedAt @map(name: "updated_at")
+  user             User?              @relation(fields: [userId], references: [id])
+  userId           BigInt?            @db.UnsignedBigInt
+  status           UploadStatus       @default(PENDING)
+  DomainPitchVideo DomainPitchVideo[]
 }
 
 enum UploadStatus {

@@ -73,8 +73,40 @@ router.get('/:name', async function (req, res) {
   }
 })
 
-router.patch('/:id/pitch-video', async function (req, res) {
-  const { id } = req.params
+router.get('/:name/pitch-videos', async function (req, res) {
+  const { name } = req.params
+  const {
+    limit = 50,
+    page = 1,
+    order_by = 'id',
+    order_dir = 'asc'
+  } = req.query
+
+  const domain = await prismaClient.domain.findUnique({
+    where: {
+      name
+    }
+  })
+  if (!domain) {
+    return res.status(404).end()
+  }
+  const orderBy: any = [{ [order_by as string]: order_dir }]
+
+  const videos = await prismaClient.domainPitchVideo.findMany({
+    where: {
+      domainId: domain.id
+    },
+    orderBy,
+    include: {
+      upload: true
+    }
+  })
+
+  res.json(serialize(videos).json)
+})
+
+router.post('/:name/pitch-videos', async function (req, res) {
+  const { name } = req.params
   const { uploadId } = req.body
   if (!uploadId) {
     return res.status(422).json({
@@ -82,6 +114,27 @@ router.patch('/:id/pitch-video', async function (req, res) {
         uploadId: 'Upload is required.'
       }
     })
+  }
+
+  try {
+    const domain = await prismaClient.domain.findUnique({
+      where: {
+        name
+      }
+    })
+    if (!domain) {
+      return res.status(404).end()
+    }
+    const rs = await prismaClient.domainPitchVideo.create({
+      data: {
+        uploadId: BigInt(uploadId),
+        domainId: domain.id
+      }
+    })
+    res.json(serialize(rs).json)
+  } catch (e) {
+    console.log(e)
+    res.status(503).end()
   }
 })
 
@@ -96,6 +149,7 @@ router.post('/import', async (req, res) => {
       resolve({ fields, files })
     })
   })
+
   const filepath = data?.files?.file.path
   await readCsvFile(filepath, async (data: string[] = []) => {
     console.log(data)

@@ -90,9 +90,34 @@ router.get('/:name', function (req, res) {
         }
     });
 });
-router.patch('/:id/pitch-video', function (req, res) {
+router.get('/:name/pitch-videos', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { id } = req.params;
+        const { name } = req.params;
+        const { limit = 50, page = 1, order_by = 'id', order_dir = 'asc' } = req.query;
+        const domain = yield primaClient_1.default.domain.findUnique({
+            where: {
+                name
+            }
+        });
+        if (!domain) {
+            return res.status(404).end();
+        }
+        const orderBy = [{ [order_by]: order_dir }];
+        const videos = yield primaClient_1.default.domainPitchVideo.findMany({
+            where: {
+                domainId: domain.id
+            },
+            orderBy,
+            include: {
+                upload: true
+            }
+        });
+        res.json(superjson_1.serialize(videos).json);
+    });
+});
+router.post('/:name/pitch-videos', function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { name } = req.params;
         const { uploadId } = req.body;
         if (!uploadId) {
             return res.status(422).json({
@@ -100,6 +125,27 @@ router.patch('/:id/pitch-video', function (req, res) {
                     uploadId: 'Upload is required.'
                 }
             });
+        }
+        try {
+            const domain = yield primaClient_1.default.domain.findUnique({
+                where: {
+                    name
+                }
+            });
+            if (!domain) {
+                return res.status(404).end();
+            }
+            const rs = yield primaClient_1.default.domainPitchVideo.create({
+                data: {
+                    uploadId: BigInt(uploadId),
+                    domainId: domain.id
+                }
+            });
+            res.json(superjson_1.serialize(rs).json);
+        }
+        catch (e) {
+            console.log(e);
+            res.status(503).end();
         }
     });
 });
