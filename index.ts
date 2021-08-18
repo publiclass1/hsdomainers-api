@@ -15,15 +15,15 @@ import getUploadUrl from './handles/getUploadUrl'
 const app = express()
 const started = Date.now()
 const port = process.env.PORT || 3000
-
 app.use(urlencoded({ extended: true }))
 app.use(json())
+app.use(cors())
 
 app.use('/auth', authRoutes)
 app.use('/domains/dns-registers', domainDNSRegistration)
 app.use('/domains/analytics', domainAnalytics)
 app.use('/domains/search', searchDomains)
-app.get('/uploads/url', cors(), getUploadUrl)
+app.get('/uploads/url', getUploadUrl)
 
 // protected routes
 app.use('/domains', jwtMiddleware, domainRoutes)

@@ -3,7 +3,6 @@ import { serialize } from 'superjson'
 import { compareSync, hashSync } from 'bcrypt'
 import prismaClient from '../lib/primaClient'
 import { generateAccessToken } from '../lib/jwt'
-import { Prisma } from '@prisma/client'
 const router = Router()
 
 

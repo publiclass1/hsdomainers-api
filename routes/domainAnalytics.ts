@@ -1,10 +1,9 @@
 import { Router } from 'express'
 import prismaClient from '../lib/primaClient'
 import merge from 'lodash/merge'
-import cors from 'cors'
 
 const router = Router()
-router.use(cors())
+
 router.get('/', async function (req, res) {
   const {
     data,
