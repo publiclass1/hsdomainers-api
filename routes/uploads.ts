@@ -57,12 +57,14 @@ router.patch('/:id', async function (req, res) {
   const userId = getUserId(req)
   const { id } = req.params
   const { status } = req.body
+
   const upload = await prismaClient.upload.findFirst({
     where: {
       id: BigInt(id),
       userId
     },
   })
+
   // console.log(name, upload)
   if (upload) {
     const updated = await prismaClient.upload.update({
@@ -73,7 +75,7 @@ router.patch('/:id', async function (req, res) {
         status
       }
     })
-    res.json(serialize(upload).json)
+    res.json(serialize(updated).json)
   } else {
     res.sendStatus(404)
   }

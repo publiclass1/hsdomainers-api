@@ -82,7 +82,7 @@ router.patch('/:id', function (req, res) {
                     status
                 }
             });
-            res.json(superjson_1.serialize(upload).json);
+            res.json(superjson_1.serialize(updated).json);
         }
         else {
             res.sendStatus(404);

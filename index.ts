@@ -1,6 +1,7 @@
 require('dotenv').config()
 import express, { Request, Response } from 'express'
 import cors from 'cors'
+import morgan from 'morgan'
 import { json, urlencoded, raw } from 'body-parser'
 import { jwtMiddleware } from './lib/jwt'
 import domainRoutes from './routes/domains'
@@ -18,16 +19,17 @@ const port = process.env.PORT || 3000
 app.use(urlencoded({ extended: true }))
 app.use(json())
 app.use(cors())
+app.use(morgan('combined'))
 
 app.use('/auth', authRoutes)
 app.use('/domains/dns-registers', domainDNSRegistration)
 app.use('/domains/analytics', domainAnalytics)
 app.use('/domains/search', searchDomains)
-app.get('/uploads/url', getUploadUrl)
 
 // protected routes
 app.use('/domains', jwtMiddleware, domainRoutes)
 app.use('/users', jwtMiddleware, userRoutes)
+app.get('/uploads/url', jwtMiddleware, getUploadUrl)
 app.use('/uploads', jwtMiddleware, uploadRoutes)
 app.get('/', (req: Request, res: Response) => {
   res.json({

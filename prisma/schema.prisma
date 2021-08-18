@@ -24,10 +24,11 @@ model User {
   createdAt     DateTime   @default(now()) @map(name: "created_at")
   updatedAt     DateTime   @updatedAt @map(name: "updated_at")
 
-  domains Domain[]
-  Account Account[]
-  Session Session[]
-  Upload  Upload[]
+  domains           Domain[]
+  Account           Account[]
+  Session           Session[]
+  uploads           Upload[]
+  domainPitchVideos DomainPitchVideo[]
   @@map(name: "users")
 }
 
@@ -137,6 +138,8 @@ model DomainPitchVideo {
   domainId    BigInt   @db.UnsignedBigInt
   upload      Upload   @relation(fields: [uploadId], references: [id])
   uploadId    BigInt   @db.UnsignedBigInt
+  user        User     @relation(fields: [userId], references: [id])
+  userId      BigInt   @db.UnsignedBigInt
   createdAt   DateTime @default(now()) @map(name: "created_at")
   updatedAt   DateTime @updatedAt @map(name: "updated_at")
 }

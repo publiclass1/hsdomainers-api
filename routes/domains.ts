@@ -98,7 +98,8 @@ router.get('/:name/pitch-videos', async function (req, res) {
     },
     orderBy,
     include: {
-      upload: true
+      upload: true,
+      user: true
     }
   })
 
@@ -107,7 +108,8 @@ router.get('/:name/pitch-videos', async function (req, res) {
 
 router.post('/:name/pitch-videos', async function (req, res) {
   const { name } = req.params
-  const { uploadId } = req.body
+  const userId = getUserId(req)
+  const { uploadId, description } = req.body
   if (!uploadId) {
     return res.status(422).json({
       error: {
@@ -127,8 +129,10 @@ router.post('/:name/pitch-videos', async function (req, res) {
     }
     const rs = await prismaClient.domainPitchVideo.create({
       data: {
+        userId,
         uploadId: BigInt(uploadId),
-        domainId: domain.id
+        domainId: domain.id,
+        description
       }
     })
     res.json(serialize(rs).json)

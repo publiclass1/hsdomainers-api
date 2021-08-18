@@ -109,7 +109,8 @@ router.get('/:name/pitch-videos', function (req, res) {
             },
             orderBy,
             include: {
-                upload: true
+                upload: true,
+                user: true
             }
         });
         res.json(superjson_1.serialize(videos).json);
@@ -118,7 +119,8 @@ router.get('/:name/pitch-videos', function (req, res) {
 router.post('/:name/pitch-videos', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { name } = req.params;
-        const { uploadId } = req.body;
+        const userId = jwt_1.getUserId(req);
+        const { uploadId, description } = req.body;
         if (!uploadId) {
             return res.status(422).json({
                 error: {
@@ -137,8 +139,10 @@ router.post('/:name/pitch-videos', function (req, res) {
             }
             const rs = yield primaClient_1.default.domainPitchVideo.create({
                 data: {
+                    userId,
                     uploadId: BigInt(uploadId),
-                    domainId: domain.id
+                    domainId: domain.id,
+                    description
                 }
             });
             res.json(superjson_1.serialize(rs).json);
