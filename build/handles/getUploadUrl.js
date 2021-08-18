@@ -29,7 +29,7 @@ function getUploadUrl(req, res) {
         if (!fileName) {
             return res.status(422).end();
         }
-        const s3FilenameKey = `${userId}-${Date.now()}-${md5_1.default(fileName)}`;
+        const s3FilenameKey = `${userId || md5_1.default(`${Date.now()}+${req.ip}`)}-${Date.now()}-${md5_1.default(fileName)}`;
         aws_sdk_1.default.config.update({
             accessKeyId: process.env.AWS_ACCESS_KEY,
             secretAccessKey: process.env.AWS_SECRET_KEY,
@@ -51,7 +51,7 @@ function getUploadUrl(req, res) {
                 userId,
                 fileName,
                 extension,
-                size: +fileSize,
+                size: +fileSize || 0,
                 type: fileType,
                 s3FileName: s3FilenameKey,
                 s3Link: `https://${AWS_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${s3FileName}`,

@@ -131,13 +131,14 @@ model DomainViewLog {
 }
 
 model DomainPitchVideo {
-  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
-  domain    Domain   @relation(fields: [domainId], references: [id])
-  domainId  BigInt   @db.UnsignedBigInt
-  upload    Upload   @relation(fields: [uploadId], references: [id])
-  uploadId  BigInt   @db.UnsignedBigInt
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  description String?
+  domain      Domain   @relation(fields: [domainId], references: [id])
+  domainId    BigInt   @db.UnsignedBigInt
+  upload      Upload   @relation(fields: [uploadId], references: [id])
+  uploadId    BigInt   @db.UnsignedBigInt
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+  updatedAt   DateTime @updatedAt @map(name: "updated_at")
 }
 
 model Upload {

@@ -16,7 +16,7 @@ export default async function getUploadUrl(req: Request, res: Response) {
   if (!fileName) {
     return res.status(422).end();
   }
-  const s3FilenameKey = `${userId}-${Date.now()}-${md5(fileName)}`
+  const s3FilenameKey = `${userId || md5(`${Date.now()}+${req.ip}`)}-${Date.now()}-${md5(fileName)}`
   aws.config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_KEY,
@@ -39,7 +39,7 @@ export default async function getUploadUrl(req: Request, res: Response) {
       userId,
       fileName,
       extension,
-      size: +fileSize,
+      size: +fileSize || 0,
       type: fileType,
       s3FileName: s3FilenameKey,
       s3Link: `https://${AWS_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${s3FileName}`,
