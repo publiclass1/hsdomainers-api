@@ -10,6 +10,7 @@ import domainDNSRegistration from './routes/domainDNSRegistration'
 import authRoutes from './routes/auth'
 import userRoutes from './routes/user'
 import uploadRoutes from './routes/uploads'
+import getUploadUrl from './handles/getUploadUrl'
 
 const app = express()
 const started = Date.now()
@@ -24,6 +25,9 @@ app.use('/auth', authRoutes)
 app.use('/domains/dns-registers', domainDNSRegistration)
 app.use('/domains/analytics', domainAnalytics)
 app.use('/domains/search', searchDomains)
+app.get('/uploads/url', getUploadUrl)
+
+// protected routes
 app.use('/domains', jwtMiddleware, domainRoutes)
 app.use('/users', jwtMiddleware, userRoutes)
 app.use('/uploads', jwtMiddleware, uploadRoutes)

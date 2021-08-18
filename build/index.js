@@ -15,6 +15,7 @@ const domainDNSRegistration_1 = __importDefault(require("./routes/domainDNSRegis
 const auth_1 = __importDefault(require("./routes/auth"));
 const user_1 = __importDefault(require("./routes/user"));
 const uploads_1 = __importDefault(require("./routes/uploads"));
+const getUploadUrl_1 = __importDefault(require("./handles/getUploadUrl"));
 const app = express_1.default();
 const started = Date.now();
 const port = process.env.PORT || 3000;
@@ -25,6 +26,8 @@ app.use('/auth', auth_1.default);
 app.use('/domains/dns-registers', domainDNSRegistration_1.default);
 app.use('/domains/analytics', domainAnalytics_1.default);
 app.use('/domains/search', searchDomains_1.default);
+app.get('/uploads/url', getUploadUrl_1.default);
+// protected routes
 app.use('/domains', jwt_1.jwtMiddleware, domains_1.default);
 app.use('/users', jwt_1.jwtMiddleware, user_1.default);
 app.use('/uploads', jwt_1.jwtMiddleware, uploads_1.default);
