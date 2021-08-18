@@ -21,12 +21,11 @@ const started = Date.now();
 const port = process.env.PORT || 3000;
 app.use(body_parser_1.urlencoded({ extended: true }));
 app.use(body_parser_1.json());
-app.use(cors_1.default());
 app.use('/auth', auth_1.default);
 app.use('/domains/dns-registers', domainDNSRegistration_1.default);
 app.use('/domains/analytics', domainAnalytics_1.default);
 app.use('/domains/search', searchDomains_1.default);
-app.get('/uploads/url', getUploadUrl_1.default);
+app.get('/uploads/url', cors_1.default(), getUploadUrl_1.default);
 // protected routes
 app.use('/domains', jwt_1.jwtMiddleware, domains_1.default);
 app.use('/users', jwt_1.jwtMiddleware, user_1.default);

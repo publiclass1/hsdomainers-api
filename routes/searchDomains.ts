@@ -1,9 +1,10 @@
+import cors from 'cors'
 import { Router } from 'express'
 import { serialize } from 'superjson'
 import prismaClient from '../lib/primaClient'
 const router = Router()
 
-
+router.use(cors())
 router.get('/:name', async function (req, res) {
   const { name } = req.params
   const domain = await prismaClient.domain.findFirst({
