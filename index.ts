@@ -16,11 +16,10 @@ const app = express()
 const started = Date.now()
 const port = process.env.PORT || 3000
 
-app.use(cors())
 app.use(urlencoded({ extended: true }))
 app.use(json())
 
-
+app.use(cors())
 app.use('/auth', authRoutes)
 app.use('/domains/dns-registers', domainDNSRegistration)
 app.use('/domains/analytics', domainAnalytics)
