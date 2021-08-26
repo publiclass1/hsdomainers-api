@@ -6,11 +6,18 @@ import { serialize } from 'superjson'
 const router = Router()
 
 router.get('/me', async function (req: any, res) {
-  res.json(req.user)
+  const userId = getUserId(req)
+  const userObj = await prismaClient.user.findUnique({
+    where: {
+      id: userId
+    }
+  })
+  res.json(serialize(userObj).json)
 })
 
 router.patch('/me', async function (req, res) {
   const userId = getUserId(req)
+
   const userObj = await prismaClient.user.findUnique({
     where: {
       id: userId
@@ -21,9 +28,6 @@ router.patch('/me', async function (req, res) {
   }
 
   const userFields = pick(req.body, ['about', 'email', 'name', 'image'])
-  console.log({
-    userFields
-  })
   const updatedUser: any = await prismaClient.user.update({
     where: {
       id: userId

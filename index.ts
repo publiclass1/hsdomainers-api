@@ -18,7 +18,12 @@ const started = Date.now()
 const port = process.env.PORT || 3000
 app.use(urlencoded({ extended: true }))
 app.use(json())
-app.use(cors())
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://testnames.link:3000',
+  ]
+}))
 app.use(morgan('combined'))
 
 app.use('/auth', authRoutes)
