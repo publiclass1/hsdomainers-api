@@ -20,7 +20,13 @@ const superjson_1 = require("superjson");
 const router = express_1.Router();
 router.get('/me', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        res.json(req.user);
+        const userId = jwt_1.getUserId(req);
+        const userObj = yield primaClient_1.default.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
+        res.json(superjson_1.serialize(userObj).json);
     });
 });
 router.patch('/me', function (req, res) {
@@ -35,9 +41,6 @@ router.patch('/me', function (req, res) {
             return res.status(404).end();
         }
         const userFields = pick_1.default(req.body, ['about', 'email', 'name', 'image']);
-        console.log({
-            userFields
-        });
         const updatedUser = yield primaClient_1.default.user.update({
             where: {
                 id: userId

@@ -13,6 +13,7 @@ const domains_1 = __importDefault(require("./routes/domains"));
 const searchDomains_1 = __importDefault(require("./routes/searchDomains"));
 const domainAnalytics_1 = __importDefault(require("./routes/domainAnalytics"));
 const domainDNSRegistration_1 = __importDefault(require("./routes/domainDNSRegistration"));
+const domainFavourites_1 = __importDefault(require("./routes/domainFavourites"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const user_1 = __importDefault(require("./routes/user"));
 const uploads_1 = __importDefault(require("./routes/uploads"));
@@ -22,13 +23,19 @@ const started = Date.now();
 const port = process.env.PORT || 3000;
 app.use(body_parser_1.urlencoded({ extended: true }));
 app.use(body_parser_1.json());
-app.use(cors_1.default());
+app.use(cors_1.default({
+    origin: [
+        'http://localhost:3000',
+        'http://testnames.link:3000',
+    ]
+}));
 app.use(morgan_1.default('combined'));
 app.use('/auth', auth_1.default);
 app.use('/domains/dns-registers', domainDNSRegistration_1.default);
 app.use('/domains/analytics', domainAnalytics_1.default);
 app.use('/domains/search', searchDomains_1.default);
 // protected routes
+app.use('/domains/favourites', jwt_1.jwtMiddleware, domainFavourites_1.default);
 app.use('/domains', jwt_1.jwtMiddleware, domains_1.default);
 app.use('/users', jwt_1.jwtMiddleware, user_1.default);
 app.get('/uploads/url', jwt_1.jwtMiddleware, getUploadUrl_1.default);

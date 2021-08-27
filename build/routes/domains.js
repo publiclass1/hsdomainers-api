@@ -68,6 +68,31 @@ router.get('/', function (req, res) {
         }
     });
 });
+/**
+ * Get domains favourites
+ */
+router.get('/favourites', function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const userId = jwt_1.getUserId(req);
+        try {
+            const data = yield primaClient_1.default.domain.findMany({
+                where: {
+                    userId,
+                    domainFavourites: {
+                        every: {
+                            id: { gt: 0 }
+                        }
+                    }
+                }
+            });
+            res.json(superjson_1.serialize(data).json);
+        }
+        catch (e) {
+            console.log(e);
+            res.status(503).end();
+        }
+    });
+});
 router.get('/:name', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { name } = req.params;
