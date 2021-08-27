@@ -54,6 +54,25 @@ router.get('/', async function (req, res) {
 /**
  * Get domains favourites
  */
+router.get('/favourites', async function (req, res) {
+  const userId = getUserId(req)
+  try {
+    const data = await prismaClient.domain.findMany({
+      where: {
+        userId,
+        domainFavourites: {
+          every: {
+            id: { gt: 0 }
+          }
+        }
+      }
+    })
+    res.json(serialize(data).json)
+  } catch (e) {
+    console.log(e)
+    res.status(503).end()
+  }
+})
 
 router.get('/:name', async function (req, res) {
   const { name } = req.params

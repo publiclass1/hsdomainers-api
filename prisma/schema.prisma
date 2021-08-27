@@ -59,8 +59,8 @@ model Domain {
   domainAnalytics   DomainAnalytic[]
   domainViewLogs    DomainViewLog[]
   domainPitchVideos DomainPitchVideo[]
+  domainFavourites  DomainFavourite[]
 
-  DomainFavourite DomainFavourite[]
   @@index([name], name: "name")
   @@map("domains")
 }

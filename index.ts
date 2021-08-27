@@ -8,6 +8,7 @@ import domainRoutes from './routes/domains'
 import searchDomains from './routes/searchDomains'
 import domainAnalytics from './routes/domainAnalytics'
 import domainDNSRegistration from './routes/domainDNSRegistration'
+import domainFavourites from './routes/domainFavourites'
 import authRoutes from './routes/auth'
 import userRoutes from './routes/user'
 import uploadRoutes from './routes/uploads'
@@ -32,6 +33,7 @@ app.use('/domains/analytics', domainAnalytics)
 app.use('/domains/search', searchDomains)
 
 // protected routes
+app.use('/domains/favourites', jwtMiddleware, domainFavourites)
 app.use('/domains', jwtMiddleware, domainRoutes)
 app.use('/users', jwtMiddleware, userRoutes)
 app.get('/uploads/url', jwtMiddleware, getUploadUrl)
