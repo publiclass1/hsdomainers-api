@@ -9,7 +9,6 @@ import toInteger from 'lodash/toInteger'
 import { Prisma } from '@prisma/client'
 import { toNumbers } from '../utils/util'
 import toObjectValues from 'lodash/values'
-import getValue from 'lodash/get'
 
 const router = Router()
 
@@ -52,6 +51,9 @@ router.get('/', async function (req, res) {
   }
 })
 
+/**
+ * Get domains favourites
+ */
 
 router.get('/:name', async function (req, res) {
   const { name } = req.params
