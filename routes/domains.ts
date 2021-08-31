@@ -81,6 +81,10 @@ router.get('/:name', async function (req, res) {
     const domain = await prismaClient.domain.findUnique({
       where: {
         name
+      },
+      include: {
+        domainAnalytics: true,
+        domainPitchVideos: true,
       }
     })
     if (domain) {

@@ -28,13 +28,26 @@ router.get('/', async function (req, res) {
   const {
     limit = 25,
     page = 1,
-    name
+    search,
+    extension
   } = req.query as any
 
-  const total = await prismaClient.domain.count()
+  const total = await prismaClient.domain.count({
+    where: {
+      name: {
+        contains: search
+      }
+    },
+  })
   const domains = await prismaClient.domain.findMany({
     where: {
-      name
+      name: {
+        contains: search
+      }
+    },
+    include: {
+      domainAnalytics: true,
+      user: true,
     },
     take: limit,
     skip: (limit * (page - 1)),
