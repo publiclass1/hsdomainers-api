@@ -31,6 +31,6 @@ export default async function authCreateAccount(req: Request, res: Response) {
 
     res.json(serialize(data).json)
   } catch (e) {
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 }

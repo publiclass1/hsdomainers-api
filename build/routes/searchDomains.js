@@ -41,11 +41,23 @@ router.get('/:name', function (req, res) {
 });
 router.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { limit = 25, page = 1, name } = req.query;
-        const total = yield primaClient_1.default.domain.count();
+        const { limit = 25, page = 1, search, extension } = req.query;
+        const total = yield primaClient_1.default.domain.count({
+            where: {
+                name: {
+                    contains: search
+                }
+            },
+        });
         const domains = yield primaClient_1.default.domain.findMany({
             where: {
-                name
+                name: {
+                    contains: search
+                }
+            },
+            include: {
+                domainAnalytics: true,
+                user: true,
             },
             take: limit,
             skip: (limit * (page - 1)),

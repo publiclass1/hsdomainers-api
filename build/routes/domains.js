@@ -100,6 +100,10 @@ router.get('/:name', function (req, res) {
             const domain = yield primaClient_1.default.domain.findUnique({
                 where: {
                     name
+                },
+                include: {
+                    domainAnalytics: true,
+                    domainPitchVideos: true,
                 }
             });
             if (domain) {
@@ -125,7 +129,7 @@ router.get('/:name/pitch-videos', function (req, res) {
             }
         });
         if (!domain) {
-            return res.status(404).end();
+            return res.status(404).send('Not Found!');
         }
         const orderBy = [{ [order_by]: order_dir }];
         const videos = yield primaClient_1.default.domainPitchVideo.findMany({
@@ -160,7 +164,7 @@ router.post('/:name/pitch-videos', function (req, res) {
                 }
             });
             if (!domain) {
-                return res.status(404).end();
+                return res.status(404).send('Not Found!');
             }
             const rs = yield primaClient_1.default.domainPitchVideo.create({
                 data: {

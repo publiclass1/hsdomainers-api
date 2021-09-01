@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
     res.json(serialize(data).json)
   } catch (e) {
     console.log(e)
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 })
 
@@ -53,7 +53,7 @@ router.put('/', async (req, res) => {
     res.json(serialize(exists).json)
   } catch (e) {
     console.log(e)
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 
 })
@@ -69,7 +69,7 @@ router.delete('/:id', async (req, res) => {
     res.status(204).end()
   } catch (e) {
     console.log(e)
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 })
 

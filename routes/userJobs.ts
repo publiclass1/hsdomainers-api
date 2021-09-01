@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     res.json(serialize(data).json)
   } catch (e) {
     console.log(e)
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 })
 
@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
       }
     })
     if (exists) {
-      res.status(422).end()
+      res.status(422).send('Unprocessable Entity!')
       return
     } else {
       exists = await prismaClient.userJob.create({
@@ -47,7 +47,7 @@ router.post('/', async (req, res) => {
     res.json(serialize(exists).json)
   } catch (e) {
     console.log(e)
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 
 })
@@ -67,7 +67,7 @@ router.patch('/:id', async (req, res) => {
       }
     })
     if (!exists) {
-      res.status(404).end()
+      res.status(404).send('Not Found!')
       return
     }
     if (exists.job.postedByUserId !== userId) {
@@ -88,7 +88,7 @@ router.patch('/:id', async (req, res) => {
     res.json(serialize(rs).json)
   } catch (e) {
     console.log(e)
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 })
 
@@ -103,7 +103,7 @@ router.delete('/:id', async (req, res) => {
       }
     })
     if (!exists) {
-      res.status(404).end()
+      res.status(404).send('Not Found!')
       return
     }
     const rs = await prismaClient.userJob.delete({
@@ -114,7 +114,7 @@ router.delete('/:id', async (req, res) => {
     res.status(204).end()
   } catch (e) {
     console.log(e)
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 })
 

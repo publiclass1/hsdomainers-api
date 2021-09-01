@@ -24,7 +24,7 @@ router.patch('/me', async function (req, res) {
     }
   })
   if (!userObj) {
-    return res.status(404).end();
+    return res.status(404).send('Not Found!');
   }
 
   const userFields = pick(req.body, ['about', 'email', 'name', 'image'])

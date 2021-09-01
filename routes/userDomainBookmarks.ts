@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     res.json(serialize(rs).json)
   } catch (e) {
     console.log(e)
-    res.status(404).end()
+    res.status(404).send('Not Found!')
   }
 })
 router.get('/:id', async (req, res) => {
@@ -31,7 +31,7 @@ router.get('/:id', async (req, res) => {
     res.json(serialize(rs).json)
   } catch (e) {
     console.log(e)
-    res.status(404).end()
+    res.status(404).send('Not Found!')
   }
 
 })
@@ -47,7 +47,7 @@ router.delete('/:id', async (req, res) => {
     })
 
     if (!exists) {
-      res.status(404).end()
+      res.status(404).send('Not Found!')
       return
     }
     await prismaClient.domainBookmark.delete({
@@ -58,7 +58,7 @@ router.delete('/:id', async (req, res) => {
     res.status(204).end()
   } catch (e) {
     console.log(e)
-    res.status(404).end()
+    res.status(404).send('Not Found!')
   }
 })
 

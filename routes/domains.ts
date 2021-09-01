@@ -113,7 +113,7 @@ router.get('/:name/pitch-videos', async function (req, res) {
     }
   })
   if (!domain) {
-    return res.status(404).end()
+    return res.status(404).send('Not Found!')
   }
   const orderBy: any = [{ [order_by as string]: order_dir }]
 
@@ -150,7 +150,7 @@ router.post('/:name/pitch-videos', async function (req, res) {
       }
     })
     if (!domain) {
-      return res.status(404).end()
+      return res.status(404).send('Not Found!')
     }
     const rs = await prismaClient.domainPitchVideo.create({
       data: {

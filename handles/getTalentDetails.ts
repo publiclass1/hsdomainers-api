@@ -14,6 +14,10 @@ export default async function getTalentDetails(req: Request, res: Response) {
         user: true
       }
     }) as any
+    if (!profile) {
+      res.status(404).send('Not Found!')
+      return
+    }
     const skills = await prismaClient.jobSkill.findMany({
       where: {
         userJobSkills: {
@@ -32,7 +36,7 @@ export default async function getTalentDetails(req: Request, res: Response) {
     }).json)
   } catch (e) {
     console.log(e)
-    res.status(404).end()
+    res.status(404).send('Not Found!')
   }
 
 }

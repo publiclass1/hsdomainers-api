@@ -43,7 +43,7 @@ export default async function putUserProfile(req: Request, res: Response) {
     res.json(serialize(prof).json)
   } catch (e) {
     console.log(e)
-    res.status(422).end()
+    res.status(422).send('Unprocessable Entity!')
   }
 
 }

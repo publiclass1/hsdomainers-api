@@ -27,7 +27,7 @@ function getUploadUrl(req, res) {
         const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
         const AWS_REGION = process.env.AWS_REGION;
         if (!fileName) {
-            return res.status(422).end();
+            return res.status(422).send('Unprocessable Entity!');
         }
         const s3FilenameKey = `${userId || md5_1.default(`${Date.now()}+${req.ip}`)}-${Date.now()}-${md5_1.default(fileName)}`;
         aws_sdk_1.default.config.update({

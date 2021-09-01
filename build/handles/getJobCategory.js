@@ -14,27 +14,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const superjson_1 = require("superjson");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
-function authCreateAccount(req, res) {
+function getJobCategory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { compoundId, userId, providerType, providerId, providerAccountId, refreshToken, accessToken, accessTokenExpires, } = req.body;
+        const { parentId } = req.query;
         try {
-            const data = yield primaClient_1.default.account.create({
-                data: {
-                    compoundId,
-                    userId,
-                    providerType,
-                    providerId,
-                    providerAccountId,
-                    refreshToken,
-                    accessToken,
-                    accessTokenExpires,
-                }
+            const where = {};
+            if (parentId) {
+                where.parentId = parentId;
+            }
+            const rs = yield primaClient_1.default.jobCategory.findMany({
+                where
             });
-            res.json(superjson_1.serialize(data).json);
+            res.json(superjson_1.serialize(rs).json);
         }
         catch (e) {
-            res.status(422).send('Unprocessable Entity!');
+            res.json([]);
         }
     });
 }
-exports.default = authCreateAccount;
+exports.default = getJobCategory;

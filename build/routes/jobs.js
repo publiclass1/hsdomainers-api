@@ -12,29 +12,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const superjson_1 = require("superjson");
+const express_1 = require("express");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
-function authCreateAccount(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { compoundId, userId, providerType, providerId, providerAccountId, refreshToken, accessToken, accessTokenExpires, } = req.body;
-        try {
-            const data = yield primaClient_1.default.account.create({
-                data: {
-                    compoundId,
-                    userId,
-                    providerType,
-                    providerId,
-                    providerAccountId,
-                    refreshToken,
-                    accessToken,
-                    accessTokenExpires,
-                }
-            });
-            res.json(superjson_1.serialize(data).json);
-        }
-        catch (e) {
-            res.status(422).send('Unprocessable Entity!');
-        }
-    });
-}
-exports.default = authCreateAccount;
+const jwt_1 = require("../lib/jwt");
+const superjson_1 = require("superjson");
+const router = express_1.Router();
+router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { title, description, expiration, salary } = req.body;
+    const userId = jwt_1.getUserId(req);
+    try {
+        const data = yield primaClient_1.default.job.create({
+            data: {
+                postedByUserId: userId,
+                title,
+                description,
+                expiration,
+                salary
+            }
+        });
+        res.json(superjson_1.serialize(data).json);
+    }
+    catch (e) {
+        console.log(e);
+        res.status(422).send('Unprocessable Entity!');
+    }
+}));
+exports.default = router;
