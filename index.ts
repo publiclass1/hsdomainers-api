@@ -1,5 +1,6 @@
 require('dotenv').config()
 import express, { Request, Response } from 'express'
+import rateLimit from "express-rate-limit"
 import cors from 'cors'
 import morgan from 'morgan'
 import { json, urlencoded, raw } from 'body-parser'
@@ -28,6 +29,14 @@ import getJobCategory from './handles/getJobCategory'
 const app = express()
 const started = Date.now()
 const port = process.env.PORT || 3000
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 512 // limit each IP to 100 requests per windowMs
+});
+
+//  apply to all requests
+app.use(limiter);
+
 app.use(urlencoded({ extended: true }))
 app.use(json())
 app.use(cors({
