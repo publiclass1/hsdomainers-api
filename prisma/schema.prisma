@@ -34,6 +34,8 @@ model User {
   jobBookmarks      JobBookmarks[]
   userJobSkills     UserJobSkill[]
   userJobs          UserJob[]
+  userJobProfile    UserJobProfile[]
+  domainBookmarks   DomainBookmark[]
   @@map(name: "users")
 }
 
@@ -64,9 +66,22 @@ model Domain {
   domainViewLogs    DomainViewLog[]
   domainPitchVideos DomainPitchVideo[]
   domainFavourites  DomainFavourite[]
+  domainBookmarks   DomainBookmark[]
 
   @@index([name], name: "name")
   @@map("domains")
+}
+
+model DomainBookmark {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  user      User     @relation(fields: [userId], references: [id])
+  userId    BigInt   @db.UnsignedBigInt
+  domain    Domain   @relation(fields: [domainId], references: [id])
+  domainId  BigInt   @db.UnsignedBigInt
+
+  @@map("domain_bookmarks")
 }
 
 enum DNSStatus {
@@ -198,11 +213,11 @@ model Job {
   postedByUser   User      @relation(fields: [postedByUserId], references: [id])
   title          String
   description    String?
-  postedDate     DateTime  @map("posted_date")
+  postedDate     DateTime? @map("posted_date")
   expiration     DateTime
   status         JobStatus @default(DRAFT)
   jobType        JobType   @default(ANY)
-  salary         Float     @default(0.00)
+  salary         Float?    @default(0.00)
   createdAt      DateTime  @default(now()) @map(name: "created_at")
   updatedAt      DateTime  @updatedAt @map(name: "updated_at")
 
@@ -251,6 +266,7 @@ model UserJobSkill {
   user       User     @relation(fields: [userId], references: [id])
   createdAt  DateTime @default(now()) @map(name: "created_at")
   updatedAt  DateTime @updatedAt @map(name: "updated_at")
+  rate       Int
 
   @@map("user_job_skills")
 }
@@ -267,6 +283,20 @@ model UserJob {
   status      UserJobStatus
 
   @@map("user_jobs")
+}
+
+model UserJobProfile {
+  id             BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  experienceYear Int      @map("experience_years")
+  expectedSalary Float    @default(0.00)
+  about          String
+  skillSummary   String   @default("skill_summary")
+  user           User     @relation(fields: [userId], references: [id])
+  userId         BigInt   @map("user_id") @db.UnsignedBigInt
+  createdAt      DateTime @default(now()) @map(name: "created_at")
+  updatedAt      DateTime @updatedAt @map(name: "updated_at")
+
+  @@map("user_job_profiles")
 }
 
 enum UserJobStatus {

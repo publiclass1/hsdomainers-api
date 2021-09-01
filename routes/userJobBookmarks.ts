@@ -1,0 +1,53 @@
+import { Router } from 'express'
+import prismaClient from '../lib/primaClient'
+import { getUserId } from '../lib/jwt'
+import { serialize } from 'superjson'
+const router = Router()
+
+router.get('/', async (req, res) => {
+  const userId = getUserId(req)
+  try {
+    const rs = await prismaClient.jobBookmarks.findMany({
+      where: {
+        userId
+      }
+    })
+    res.json(serialize(rs).json)
+  } catch (e) {
+    console.log(e)
+    res.status(404).end()
+  }
+})
+router.get('/:id', async (req, res) => {
+  const userId = getUserId(req)
+  const { id } = req.params
+  try {
+    const rs = await prismaClient.jobBookmarks.findFirst({
+      where: {
+        id: BigInt(id),
+        userId
+      }
+    })
+    res.json(serialize(rs).json)
+  } catch (e) {
+    console.log(e)
+    res.status(404).end()
+  }
+
+})
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    const rs = await prismaClient.jobBookmarks.delete({
+      where: {
+        id: BigInt(id)
+      }
+    })
+    res.status(204).end()
+  } catch (e) {
+    console.log(e)
+    res.status(404).end()
+  }
+})
+
+export default router
