@@ -14,7 +14,7 @@ import userRoutes from './routes/user'
 import uploadRoutes from './routes/uploads'
 import userBookmarks from './routes/userJobBookmarks'
 import userSkills from './routes/userSkills'
-import userAppliedJobs from './routes/userAppliedJobs'
+import userJobs from './routes/userJobs'
 import jobs from './routes/jobs'
 import jobCategory from './routes/jobCategory'
 import jobSkills from './routes/jobSkills'
@@ -62,7 +62,7 @@ app.use('/domains', jwtMiddleware, domainRoutes)
 //employers jobs posted
 // users applied jobs
 app.put('/users/:id/job-profiles', jwtMiddleware, putUserProfile)
-app.use('/users/:id/jobs', jwtMiddleware, userAppliedJobs)
+app.use('/users/:id/jobs', jwtMiddleware, userJobs)
 app.use('/users/:id/skills', jwtMiddleware, userSkills)
 app.use('/users/:id/job-bookmarks', jwtMiddleware, userBookmarks)
 app.use('/users', jwtMiddleware, userRoutes)
