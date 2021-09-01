@@ -30,6 +30,10 @@ model User {
   uploads           Upload[]
   domainPitchVideos DomainPitchVideo[]
   domainFavourite   DomainFavourite[]
+  postedJobs        Job[]
+  jobBookmarks      JobBookmarks[]
+  userJobSkills     UserJobSkill[]
+  userJobs          UserJob[]
   @@map(name: "users")
 }
 
@@ -173,6 +177,120 @@ model Upload {
   status           UploadStatus       @default(PENDING)
   DomainPitchVideo DomainPitchVideo[]
 }
+
+// Jobs
+model JobCategory {
+  id        BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  name      String
+  createdAt DateTime     @default(now()) @map(name: "created_at")
+  updatedAt DateTime     @updatedAt @map(name: "updated_at")
+  parentId  BigInt?      @db.UnsignedBigInt
+  parent    JobCategory? @relation(fields: [parentId], references: [id])
+
+  jobCategories       JobCategory[]       @relation("JobCategoryToJobCategory")
+  jobPostedCategories JobPostedCategory[]
+  @@map("job_categories")
+}
+
+model Job {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  postedByUserId BigInt    @map("postedby_user_id") @db.UnsignedBigInt
+  postedByUser   User      @relation(fields: [postedByUserId], references: [id])
+  title          String
+  description    String?
+  postedDate     DateTime  @map("posted_date")
+  expiration     DateTime
+  status         JobStatus @default(DRAFT)
+  jobType        JobType   @default(ANY)
+  salary         Float     @default(0.00)
+  createdAt      DateTime  @default(now()) @map(name: "created_at")
+  updatedAt      DateTime  @updatedAt @map(name: "updated_at")
+
+  jobPostedCategories JobPostedCategory[]
+  jobBookmarks        JobBookmarks[]
+  UserJob             UserJob[]
+  @@map("jobs")
+}
+
+model JobPostedCategory {
+  id            BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  jobCategoryId BigInt      @map("job_category_id") @db.UnsignedBigInt
+  jobCategory   JobCategory @relation(fields: [jobCategoryId], references: [id])
+  jobId         BigInt      @map("job_id") @db.UnsignedBigInt
+  job           Job         @relation(fields: [jobId], references: [id])
+
+  @@map("jobs_posted_categories")
+}
+
+model JobBookmarks {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userId    BigInt   @map("user_id") @db.UnsignedBigInt
+  user      User     @relation(fields: [userId], references: [id])
+  jobId     BigInt   @map("job_id") @db.UnsignedBigInt
+  job       Job      @relation(fields: [jobId], references: [id])
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@map("job_bookmarks")
+}
+
+model JobSkill {
+  id   BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  name String
+
+  userJobSkills UserJobSkill[]
+  @@unique([name])
+  @@map("job_skills")
+}
+
+model UserJobSkill {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  jobSkillId BigInt   @map("job_skill_id") @db.UnsignedBigInt
+  jobSkill   JobSkill @relation(fields: [jobSkillId], references: [id])
+  userId     BigInt   @map("user_id") @db.UnsignedBigInt
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now()) @map(name: "created_at")
+  updatedAt  DateTime @updatedAt @map(name: "updated_at")
+
+  @@map("user_job_skills")
+}
+
+model UserJob {
+  id          BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  jobId       BigInt        @map("job_id") @db.UnsignedBigInt
+  job         Job           @relation(fields: [jobId], references: [id])
+  userId      BigInt        @map("user_id") @db.UnsignedBigInt
+  user        User          @relation(fields: [userId], references: [id])
+  createdAt   DateTime      @default(now()) @map(name: "created_at")
+  updatedAt   DateTime      @updatedAt @map(name: "updated_at")
+  appliedDate DateTime      @map("applied_date")
+  status      UserJobStatus
+
+  @@map("user_jobs")
+}
+
+enum UserJobStatus {
+  HIRED
+  REJECTED
+  APPLIED
+  APPROVED
+}
+
+enum JobStatus {
+  DRAFT
+  POSTED
+  INACTIVE
+}
+
+enum JobType {
+  ANY
+  FULL_TIME
+  PART_TIME
+  PROJECT_BASED
+  HOURLY
+}
+
+// end of jobs
 
 enum UploadStatus {
   PENDING
