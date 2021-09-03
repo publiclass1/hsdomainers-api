@@ -9,6 +9,8 @@ import toInteger from 'lodash/toInteger'
 import { Prisma } from '@prisma/client'
 import { toNumbers } from '../utils/util'
 import toObjectValues from 'lodash/values'
+import postCreateManyDomain from '../handles/postCreateManyDomain'
+import { createDomain } from '../services/domains'
 
 const router = Router()
 
@@ -18,19 +20,37 @@ router.get('/', async function (req, res) {
   const {
     limit = 25,
     page = 1,
+    search = '',
+    priceFrom,
+    priceTo,
+    extension,
     order_by = 'id'
   } = req.query as any
 
   try {
-    const total = await prismaClient.domain.count({
-      where: {
-        userId
+    const where: any = {
+      userId
+    }
+    if (search) {
+      where.name = {
+        contains: search
       }
+    }
+    if (extension) {
+      where.extension = extension
+    }
+    if (priceFrom !== undefined && priceTo !== undefined) {
+      where.buynowPrice = {
+        gte: priceFrom,
+        lt: priceTo
+      }
+    }
+
+    const total = await prismaClient.domain.count({
+      where
     })
     const domains = await prismaClient.domain.findMany({
-      where: {
-        userId
-      },
+      where,
       include: {
         domainAnalytics: true
       },
@@ -180,44 +200,20 @@ router.post('/import', async (req, res) => {
   })
 
   const filepath = data?.files?.file.path
+  const userId = getUserId(req)
   await readCsvFile(filepath, async (data: string[] = []) => {
-    console.log(data)
     const domainName = data?.[0];
     if (!domainName) {
       return
     }
-    try {
-      let exists = await prismaClient.domain.findFirst({
-        where: {
-          name: domainName,
-          userId: getUserId(req)
-        }
-      })
-      if (!exists) {
-        await prismaClient.domain.create({
-          data: {
-            name: domainName,
-            nameLength: domainName.length,
-            hasHypen: domainName.includes('-'),
-            hasNumber: /^\d+$/.test(domainName),
-            extension: domainName.split('.')?.pop() || '',
-            userId: getUserId(req),
-            dnsStatus: 'PENDING',
-            leasePrice: 0,
-            buynowPrice: 0,
-            monthlyPrice: 0,
-            minimumOfferPrice: 0,
-          }
-        })
-      }
-    } catch (e) {
-      console.log(e.message)
-    }
+    await createDomain(userId, domainName)
   })
   res.json({
     status: 'uploaded'
   })
 })
+
+router.post('/import-string', postCreateManyDomain)
 
 router.post('/', async function (req, res) {
   const { name, ...restData } = req.body as any
@@ -288,7 +284,6 @@ router.patch('/:id', async (req, res) => {
 
 
 })
-
 
 router.delete('/:id', async (req, res) => {
   const id = BigInt(req.params.id)

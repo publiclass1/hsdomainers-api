@@ -61,6 +61,8 @@ router.post('/register', async function (req, res) {
     if (user) {
       delete user.password
     }
+    console.log(1)
+
     const token = generateAccessToken(user)
     res.json({ token })
   } catch (e) {
