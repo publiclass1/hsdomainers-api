@@ -40,12 +40,12 @@ app.use(limiter);
 app.use(urlencoded({ extended: true }))
 app.use(json())
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:3002',
-    'http://testnames.link:3000',
-  ]
+  // origin: [
+  //   'http://localhost:3000',
+  //   'http://localhost:3001',
+  //   'http://localhost:3002',
+  //   'http://testnames.link:3000',
+  // ]
 }))
 app.use(morgan('combined'))
 
