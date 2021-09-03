@@ -16,10 +16,10 @@ const express_1 = require("express");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const jwt_1 = require("../lib/jwt");
 const superjson_1 = require("superjson");
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { title, description, expiration, salary } = req.body;
-    const userId = jwt_1.getUserId(req);
+    const userId = (0, jwt_1.getUserId)(req);
     try {
         const data = yield primaClient_1.default.job.create({
             data: {
@@ -30,7 +30,7 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 salary
             }
         });
-        res.json(superjson_1.serialize(data).json);
+        res.json((0, superjson_1.serialize)(data).json);
     }
     catch (e) {
         console.log(e);

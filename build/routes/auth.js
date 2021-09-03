@@ -17,7 +17,7 @@ const superjson_1 = require("superjson");
 const bcrypt_1 = require("bcrypt");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const jwt_1 = require("../lib/jwt");
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.post('/login', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { email, password } = req.body;
@@ -29,11 +29,11 @@ router.post('/login', function (req, res) {
                 }
             });
             console.log(user);
-            if (user && bcrypt_1.compareSync(password, user.password || '')) {
+            if (user && (0, bcrypt_1.compareSync)(password, user.password || '')) {
                 delete user.password;
-                const serialedUser = superjson_1.serialize(user).json;
+                const serialedUser = (0, superjson_1.serialize)(user).json;
                 res.json({
-                    token: jwt_1.generateAccessToken(serialedUser),
+                    token: (0, jwt_1.generateAccessToken)(serialedUser),
                     user: serialedUser
                 });
             }
@@ -60,7 +60,7 @@ router.post('/register', function (req, res) {
                 }
             });
         }
-        const hash = bcrypt_1.hashSync(password, 10);
+        const hash = (0, bcrypt_1.hashSync)(password, 10);
         try {
             const user = yield primaClient_1.default.user.create({
                 data: {
@@ -71,7 +71,8 @@ router.post('/register', function (req, res) {
             if (user) {
                 delete user.password;
             }
-            const token = jwt_1.generateAccessToken(user);
+            console.log(1);
+            const token = (0, jwt_1.generateAccessToken)(user);
             res.json({ token });
         }
         catch (e) {

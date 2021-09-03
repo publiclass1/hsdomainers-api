@@ -8,28 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const superjson_1 = require("superjson");
-const primaClient_1 = __importDefault(require("../lib/primaClient"));
-function getJobCategory(req, res) {
+const jwt_1 = require("../lib/jwt");
+const domains_1 = require("../services/domains");
+function postCreateManyDomain(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { parentId } = req.query;
-        try {
-            const where = {};
-            if (parentId) {
-                where.parentId = parentId;
-            }
-            const rs = yield primaClient_1.default.jobCategory.findMany({
-                where
-            });
-            res.json((0, superjson_1.serialize)(rs).json);
+        const { payload } = req.body;
+        const data = payload.split('\n');
+        const userId = (0, jwt_1.getUserId)(req);
+        for (let d of data) {
+            const [name, buyPrice] = d.split(',');
+            console.log({ name, buyPrice });
+            yield (0, domains_1.createDomain)(userId, name, buyPrice);
         }
-        catch (e) {
-            res.json([]);
-        }
+        res.sendStatus(200);
     });
 }
-exports.default = getJobCategory;
+exports.default = postCreateManyDomain;

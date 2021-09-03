@@ -22,7 +22,7 @@ class DNSServerAPIService {
                 domains
             });
             try {
-                const rs = yield node_fetch_1.default(`${API_URL}/domains`, {
+                const rs = yield (0, node_fetch_1.default)(`${API_URL}/domains`, {
                     method: 'POST',
                     headers: {
                         'content-type': 'application/json',
@@ -45,7 +45,7 @@ class DNSServerAPIService {
     static removeRecordByDomain(domain) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const rs = yield node_fetch_1.default(`${API_URL}/domains/${domain}`, {
+                const rs = yield (0, node_fetch_1.default)(`${API_URL}/domains/${domain}`, {
                     headers: {
                         'x-token': TOKEN
                     },

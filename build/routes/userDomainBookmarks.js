@@ -16,16 +16,16 @@ const express_1 = require("express");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const jwt_1 = require("../lib/jwt");
 const superjson_1 = require("superjson");
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = jwt_1.getUserId(req);
+    const userId = (0, jwt_1.getUserId)(req);
     try {
         const rs = yield primaClient_1.default.domainBookmark.findMany({
             where: {
                 userId
             }
         });
-        res.json(superjson_1.serialize(rs).json);
+        res.json((0, superjson_1.serialize)(rs).json);
     }
     catch (e) {
         console.log(e);
@@ -33,7 +33,7 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = jwt_1.getUserId(req);
+    const userId = (0, jwt_1.getUserId)(req);
     const { id } = req.params;
     try {
         const rs = yield primaClient_1.default.domainBookmark.findFirst({
@@ -42,7 +42,7 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 userId
             }
         });
-        res.json(superjson_1.serialize(rs).json);
+        res.json((0, superjson_1.serialize)(rs).json);
     }
     catch (e) {
         console.log(e);
@@ -51,7 +51,7 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 }));
 router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const userId = jwt_1.getUserId(req);
+    const userId = (0, jwt_1.getUserId)(req);
     try {
         const exists = yield primaClient_1.default.domainBookmark.findFirst({
             where: {

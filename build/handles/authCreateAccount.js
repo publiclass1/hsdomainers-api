@@ -30,7 +30,7 @@ function authCreateAccount(req, res) {
                     accessTokenExpires,
                 }
             });
-            res.json(superjson_1.serialize(data).json);
+            res.json((0, superjson_1.serialize)(data).json);
         }
         catch (e) {
             res.status(422).send('Unprocessable Entity!');

@@ -26,7 +26,7 @@ function jwtMiddleware(req, res, next) {
 }
 exports.jwtMiddleware = jwtMiddleware;
 function generateAccessToken(userData) {
-    return jsonwebtoken_1.default.sign(superjson_1.serialize(userData).json, secret, {
+    return jsonwebtoken_1.default.sign((0, superjson_1.serialize)(userData).json, secret, {
         expiresIn: '1y'
     });
 }

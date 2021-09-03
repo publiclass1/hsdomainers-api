@@ -16,9 +16,9 @@ const express_1 = require("express");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const jwt_1 = require("../lib/jwt");
 const superjson_1 = require("superjson");
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = jwt_1.getUserId(req);
+    const userId = (0, jwt_1.getUserId)(req);
     const { rate, jobSkillId } = req.body;
     try {
         let data = yield primaClient_1.default.userJobSkill.findMany({
@@ -26,7 +26,7 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 userId,
             }
         });
-        res.json(superjson_1.serialize(data).json);
+        res.json((0, superjson_1.serialize)(data).json);
     }
     catch (e) {
         console.log(e);
@@ -34,7 +34,7 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 router.put('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = jwt_1.getUserId(req);
+    const userId = (0, jwt_1.getUserId)(req);
     const { rate, jobSkillId } = req.body;
     try {
         let exists = yield primaClient_1.default.userJobSkill.findFirst({
@@ -62,7 +62,7 @@ router.put('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 },
             });
         }
-        res.json(superjson_1.serialize(exists).json);
+        res.json((0, superjson_1.serialize)(exists).json);
     }
     catch (e) {
         console.log(e);
@@ -70,7 +70,7 @@ router.put('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = jwt_1.getUserId(req);
+    const userId = (0, jwt_1.getUserId)(req);
     const { id } = req.params;
     try {
         const rs = yield primaClient_1.default.userJobSkill.delete({

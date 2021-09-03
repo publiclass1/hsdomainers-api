@@ -20,7 +20,7 @@ const superjson_1 = require("superjson");
 function getUploadUrl(req, res) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         const fileName = req.query.fileName;
         const fileSize = req.query.fileSize;
         const fileType = req.query.fileType;
@@ -29,7 +29,7 @@ function getUploadUrl(req, res) {
         if (!fileName) {
             return res.status(422).send('Unprocessable Entity!');
         }
-        const s3FilenameKey = `${userId || md5_1.default(`${Date.now()}+${req.ip}`)}-${Date.now()}-${md5_1.default(fileName)}`;
+        const s3FilenameKey = `${userId || (0, md5_1.default)(`${Date.now()}+${req.ip}`)}-${Date.now()}-${(0, md5_1.default)(fileName)}`;
         aws_sdk_1.default.config.update({
             accessKeyId: process.env.AWS_ACCESS_KEY,
             secretAccessKey: process.env.AWS_SECRET_KEY,
@@ -57,7 +57,7 @@ function getUploadUrl(req, res) {
                 s3Link: `https://${AWS_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${s3FileName}`,
             }
         });
-        res.status(200).json({ url, data: superjson_1.serialize(data).json });
+        res.status(200).json({ url, data: (0, superjson_1.serialize)(data).json });
     });
 }
 exports.default = getUploadUrl;

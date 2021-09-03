@@ -12,49 +12,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const superjson_1 = require("superjson");
-const jwt_1 = require("../lib/jwt");
+exports.createDomain = void 0;
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
-function putUserProfile(req, res) {
+function createDomain(userId, name, price = 0) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = (0, jwt_1.getUserId)(req);
-        const { about, expectedSalary, experienceYear, skillSummary, } = req.body;
         try {
-            let prof = yield primaClient_1.default.userJobProfile.findFirst({
+            let exists = yield primaClient_1.default.domain.findFirst({
                 where: {
-                    userId
+                    name,
+                    userId,
+                    buynowPrice: price
                 }
             });
-            if (!prof) {
-                prof = yield primaClient_1.default.userJobProfile.create({
+            if (!exists) {
+                exists = yield primaClient_1.default.domain.create({
                     data: {
+                        name: name,
+                        nameLength: name.length,
+                        hasHypen: name.includes('-'),
+                        hasNumber: /^\d+$/.test(name),
+                        extension: ((_a = name.split('.')) === null || _a === void 0 ? void 0 : _a.pop()) || '',
                         userId,
-                        about,
-                        expectedSalary,
-                        experienceYear,
-                        skillSummary,
+                        dnsStatus: 'PENDING',
+                        leasePrice: 0,
+                        buynowPrice: 0,
+                        monthlyPrice: 0,
+                        minimumOfferPrice: 0,
                     }
                 });
             }
-            else {
-                prof = yield primaClient_1.default.userJobProfile.update({
-                    where: {
-                        id: prof.id
-                    },
-                    data: {
-                        about,
-                        expectedSalary,
-                        experienceYear,
-                        skillSummary,
-                    }
-                });
-            }
-            res.json((0, superjson_1.serialize)(prof).json);
+            return exists;
         }
         catch (e) {
-            console.log(e);
-            res.status(422).send('Unprocessable Entity!');
+            console.log(e.message);
         }
+        return null;
     });
 }
-exports.default = putUserProfile;
+exports.createDomain = createDomain;

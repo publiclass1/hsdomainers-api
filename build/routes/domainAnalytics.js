@@ -15,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const merge_1 = __importDefault(require("lodash/merge"));
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { data, domain, type, ip = req.socket.remoteAddress, agent = req.headers['user-agent'] } = merge_1.default(req.body, req.query);
+        const { data, domain, type, ip = req.socket.remoteAddress, agent = req.headers['user-agent'] } = (0, merge_1.default)(req.body, req.query);
         const domainData = yield primaClient_1.default.domain.findUnique({
             where: { name: domain }
         });

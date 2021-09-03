@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 const express_1 = __importDefault(require("express"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
 const body_parser_1 = require("body-parser");
@@ -29,18 +30,26 @@ const getJobSkills_1 = __importDefault(require("./handles/getJobSkills"));
 const getTalentDetails_1 = __importDefault(require("./handles/getTalentDetails"));
 const putUserProfile_1 = __importDefault(require("./handles/putUserProfile"));
 const getJobCategory_1 = __importDefault(require("./handles/getJobCategory"));
-const app = express_1.default();
+const app = (0, express_1.default)();
 const started = Date.now();
 const port = process.env.PORT || 3000;
-app.use(body_parser_1.urlencoded({ extended: true }));
-app.use(body_parser_1.json());
-app.use(cors_1.default({
+const limiter = (0, express_rate_limit_1.default)({
+    windowMs: 1 * 60 * 1000,
+    max: 512 // limit each IP to 100 requests per windowMs
+});
+//  apply to all requests
+app.use(limiter);
+app.use((0, body_parser_1.urlencoded)({ extended: true }));
+app.use((0, body_parser_1.json)());
+app.use((0, cors_1.default)({
     origin: [
         'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
         'http://testnames.link:3000',
     ]
 }));
-app.use(morgan_1.default('combined'));
+app.use((0, morgan_1.default)('combined'));
 app.use('/auth', auth_1.default);
 app.use('/domains/dns-registers', domainDNSRegistration_1.default);
 app.use('/domains/analytics', domainAnalytics_1.default);

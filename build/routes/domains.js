@@ -33,32 +33,47 @@ const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const toInteger_1 = __importDefault(require("lodash/toInteger"));
 const util_1 = require("../utils/util");
 const values_1 = __importDefault(require("lodash/values"));
-const router = express_1.Router();
+const postCreateManyDomain_1 = __importDefault(require("../handles/postCreateManyDomain"));
+const domains_1 = require("../services/domains");
+const router = (0, express_1.Router)();
 router.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
-        const { limit = 25, page = 1, order_by = 'id' } = req.query;
+        const userId = (0, jwt_1.getUserId)(req);
+        const { limit = 25, page = 1, search = '', priceFrom, priceTo, extension, order_by = 'id' } = req.query;
         try {
+            const where = {
+                userId
+            };
+            if (search) {
+                where.name = {
+                    contains: search
+                };
+            }
+            if (extension) {
+                where.extension = extension;
+            }
+            if (priceFrom !== undefined && priceTo !== undefined) {
+                where.buynowPrice = {
+                    gte: priceFrom,
+                    lt: priceTo
+                };
+            }
             const total = yield primaClient_1.default.domain.count({
-                where: {
-                    userId
-                }
+                where
             });
             const domains = yield primaClient_1.default.domain.findMany({
-                where: {
-                    userId
-                },
+                where,
                 include: {
                     domainAnalytics: true
                 },
-                take: toInteger_1.default(limit),
-                skip: (toInteger_1.default(limit) * (toInteger_1.default(page) - 1)),
+                take: (0, toInteger_1.default)(limit),
+                skip: ((0, toInteger_1.default)(limit) * ((0, toInteger_1.default)(page) - 1)),
                 orderBy: {
                     id: 'asc'
                 }
             });
             res.json({
-                data: superjson_1.serialize(domains).json,
+                data: (0, superjson_1.serialize)(domains).json,
                 total
             });
         }
@@ -73,7 +88,7 @@ router.get('/', function (req, res) {
  */
 router.get('/favourites', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         try {
             const data = yield primaClient_1.default.domain.findMany({
                 where: {
@@ -85,7 +100,7 @@ router.get('/favourites', function (req, res) {
                     }
                 }
             });
-            res.json(superjson_1.serialize(data).json);
+            res.json((0, superjson_1.serialize)(data).json);
         }
         catch (e) {
             console.log(e);
@@ -107,7 +122,7 @@ router.get('/:name', function (req, res) {
                 }
             });
             if (domain) {
-                res.json(superjson_1.serialize(domain).json);
+                res.json((0, superjson_1.serialize)(domain).json);
             }
             else {
                 res.sendStatus(404);
@@ -142,13 +157,13 @@ router.get('/:name/pitch-videos', function (req, res) {
                 user: true
             }
         });
-        res.json(superjson_1.serialize(videos).json);
+        res.json((0, superjson_1.serialize)(videos).json);
     });
 });
 router.post('/:name/pitch-videos', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { name } = req.params;
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         const { uploadId, description } = req.body;
         if (!uploadId) {
             return res.status(422).json({
@@ -174,7 +189,7 @@ router.post('/:name/pitch-videos', function (req, res) {
                     description
                 }
             });
-            res.json(superjson_1.serialize(rs).json);
+            res.json((0, superjson_1.serialize)(rs).json);
         }
         catch (e) {
             console.log(e);
@@ -196,56 +211,29 @@ router.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     });
     const filepath = (_a = data === null || data === void 0 ? void 0 : data.files) === null || _a === void 0 ? void 0 : _a.file.path;
+    const userId = (0, jwt_1.getUserId)(req);
     yield readCsvFile(filepath, (data = []) => __awaiter(void 0, void 0, void 0, function* () {
-        var _b;
-        console.log(data);
         const domainName = data === null || data === void 0 ? void 0 : data[0];
         if (!domainName) {
             return;
         }
-        try {
-            let exists = yield primaClient_1.default.domain.findFirst({
-                where: {
-                    name: domainName,
-                    userId: jwt_1.getUserId(req)
-                }
-            });
-            if (!exists) {
-                yield primaClient_1.default.domain.create({
-                    data: {
-                        name: domainName,
-                        nameLength: domainName.length,
-                        hasHypen: domainName.includes('-'),
-                        hasNumber: /^\d+$/.test(domainName),
-                        extension: ((_b = domainName.split('.')) === null || _b === void 0 ? void 0 : _b.pop()) || '',
-                        userId: jwt_1.getUserId(req),
-                        dnsStatus: 'PENDING',
-                        leasePrice: 0,
-                        buynowPrice: 0,
-                        monthlyPrice: 0,
-                        minimumOfferPrice: 0,
-                    }
-                });
-            }
-        }
-        catch (e) {
-            console.log(e.message);
-        }
+        yield (0, domains_1.createDomain)(userId, domainName);
     }));
     res.json({
         status: 'uploaded'
     });
 }));
+router.post('/import-string', postCreateManyDomain_1.default);
 router.post('/', function (req, res) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const _b = req.body, { name } = _b, restData = __rest(_b, ["name"]);
-        const parseData = util_1.toNumbers(restData);
+        const parseData = (0, util_1.toNumbers)(restData);
         try {
             const count = yield primaClient_1.default.domain.count({
                 where: {
                     name,
-                    userId: jwt_1.getUserId(req)
+                    userId: (0, jwt_1.getUserId)(req)
                 }
             });
             if (count) {
@@ -256,9 +244,9 @@ router.post('/', function (req, res) {
                 });
             }
             const domain = yield primaClient_1.default.domain.create({
-                data: Object.assign(Object.assign({ name }, parseData), { dnsStatus: 'PENDING', nameLength: name.length, hasHypen: name.includes('-'), hasNumber: /^\d+$/.test(name), extension: ((_a = name.split('.')) === null || _a === void 0 ? void 0 : _a.pop()) || '', userId: jwt_1.getUserId(req) })
+                data: Object.assign(Object.assign({ name }, parseData), { dnsStatus: 'PENDING', nameLength: name.length, hasHypen: name.includes('-'), hasNumber: /^\d+$/.test(name), extension: ((_a = name.split('.')) === null || _a === void 0 ? void 0 : _a.pop()) || '', userId: (0, jwt_1.getUserId)(req) })
             });
-            res.json(superjson_1.serialize(domain).json);
+            res.json((0, superjson_1.serialize)(domain).json);
         }
         catch (e) {
             console.log(e);
@@ -269,13 +257,13 @@ router.post('/', function (req, res) {
 router.patch('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = BigInt(req.params.id);
     const data = req.body;
-    const parseData = util_1.toNumbers(data);
+    const parseData = (0, util_1.toNumbers)(data);
     console.log({ data, parseData });
     try {
         const domain = yield primaClient_1.default.domain.findFirst({
             where: {
                 id,
-                userId: jwt_1.getUserId(req)
+                userId: (0, jwt_1.getUserId)(req)
             }
         });
         if (!domain) {
@@ -285,7 +273,7 @@ router.patch('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* (
             where: { id: domain.id },
             data: Object.assign({}, parseData)
         });
-        res.json(superjson_1.serialize(domain).json);
+        res.json((0, superjson_1.serialize)(domain).json);
     }
     catch (error) {
         console.log(error);
@@ -299,7 +287,7 @@ router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const domain = yield primaClient_1.default.domain.findFirst({
             where: {
                 id,
-                userId: jwt_1.getUserId(req)
+                userId: (0, jwt_1.getUserId)(req)
             }
         });
         if (!domain) {
@@ -320,7 +308,7 @@ function readCsvFile(filepath, cb) {
     return __awaiter(this, void 0, void 0, function* () {
         const stream = fs_1.default.createReadStream(filepath);
         return yield new Promise((resolve) => {
-            stream.pipe(csvtojson_1.default({
+            stream.pipe((0, csvtojson_1.default)({
                 alwaysSplitAtEOL: true,
                 checkColumn: false,
                 noheader: true,
@@ -332,7 +320,7 @@ function readCsvFile(filepath, cb) {
                     if (!domain) {
                         return null;
                     }
-                    const objArray = values_1.default(domain);
+                    const objArray = (0, values_1.default)(domain);
                     yield cb(objArray);
                 });
             })

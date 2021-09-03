@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const superjson_1 = require("superjson");
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { search = '', page = 1, limit = 25 } = req.query;
@@ -28,7 +28,7 @@ router.get('/', function (req, res) {
             skip: (parseInt(page) - 1 * parseInt(limit)),
             take: parseInt(limit, 10)
         });
-        res.json(superjson_1.serialize(data).json);
+        res.json((0, superjson_1.serialize)(data).json);
     });
 });
 router.post('/', function (req, res) {
@@ -47,7 +47,7 @@ router.post('/', function (req, res) {
                 }
             });
         }
-        res.json(superjson_1.serialize(jobCategory).json);
+        res.json((0, superjson_1.serialize)(jobCategory).json);
     });
 });
 exports.default = router;

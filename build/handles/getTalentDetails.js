@@ -42,7 +42,7 @@ function getTalentDetails(req, res) {
             if (profile === null || profile === void 0 ? void 0 : profile.user) {
                 delete profile.user.password;
             }
-            res.json(superjson_1.serialize({
+            res.json((0, superjson_1.serialize)({
                 profile,
                 skills
             }).json);

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const superjson_1 = require("superjson");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.get('/:name', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { name } = req.params;
@@ -32,7 +32,7 @@ router.get('/:name', function (req, res) {
         });
         // console.log(name, domain)
         if (domain) {
-            res.json(superjson_1.serialize(domain).json);
+            res.json((0, superjson_1.serialize)(domain).json);
         }
         else {
             res.sendStatus(404);
@@ -66,7 +66,7 @@ router.get('/', function (req, res) {
             }
         });
         res.json({
-            data: superjson_1.serialize(domains).json,
+            data: (0, superjson_1.serialize)(domains).json,
             total
         });
     });

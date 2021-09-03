@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const dns_service_1 = __importDefault(require("../lib/dns.service."));
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const domains = yield primaClient_1.default.domain.findMany({
         take: 255,

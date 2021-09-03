@@ -16,11 +16,11 @@ const express_1 = require("express");
 const superjson_1 = require("superjson");
 const jwt_1 = require("../lib/jwt");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { limit = 25, page = 1, } = req.query;
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         const total = yield primaClient_1.default.upload.count({
             where: {
                 userId
@@ -37,14 +37,14 @@ router.get('/', function (req, res) {
             }
         });
         res.json({
-            data: superjson_1.serialize(files).json,
+            data: (0, superjson_1.serialize)(files).json,
             total
         });
     });
 });
 router.get('/:id', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         const { id } = req.params;
         const upload = yield primaClient_1.default.upload.findFirst({
             where: {
@@ -54,7 +54,7 @@ router.get('/:id', function (req, res) {
         });
         // console.log(name, upload)
         if (upload) {
-            res.json(superjson_1.serialize(upload).json);
+            res.json((0, superjson_1.serialize)(upload).json);
         }
         else {
             res.sendStatus(404);
@@ -63,7 +63,7 @@ router.get('/:id', function (req, res) {
 });
 router.patch('/:id', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         const { id } = req.params;
         const { status } = req.body;
         const upload = yield primaClient_1.default.upload.findFirst({
@@ -82,7 +82,7 @@ router.patch('/:id', function (req, res) {
                     status
                 }
             });
-            res.json(superjson_1.serialize(updated).json);
+            res.json((0, superjson_1.serialize)(updated).json);
         }
         else {
             res.sendStatus(404);

@@ -17,21 +17,21 @@ const primaClient_1 = __importDefault(require("../lib/primaClient"));
 const pick_1 = __importDefault(require("lodash/pick"));
 const jwt_1 = require("../lib/jwt");
 const superjson_1 = require("superjson");
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 router.get('/me', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         const userObj = yield primaClient_1.default.user.findUnique({
             where: {
                 id: userId
             }
         });
-        res.json(superjson_1.serialize(userObj).json);
+        res.json((0, superjson_1.serialize)(userObj).json);
     });
 });
 router.patch('/me', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         const userObj = yield primaClient_1.default.user.findUnique({
             where: {
                 id: userId
@@ -40,7 +40,7 @@ router.patch('/me', function (req, res) {
         if (!userObj) {
             return res.status(404).send('Not Found!');
         }
-        const userFields = pick_1.default(req.body, ['about', 'email', 'name', 'image']);
+        const userFields = (0, pick_1.default)(req.body, ['about', 'email', 'name', 'image']);
         const updatedUser = yield primaClient_1.default.user.update({
             where: {
                 id: userId
@@ -50,8 +50,8 @@ router.patch('/me', function (req, res) {
         if (updatedUser === null || updatedUser === void 0 ? void 0 : updatedUser.password) {
             updatedUser === null || updatedUser === void 0 ? true : delete updatedUser.password;
         }
-        updatedUser.token = jwt_1.generateAccessToken(updatedUser);
-        const data = superjson_1.serialize(updatedUser).json;
+        updatedUser.token = (0, jwt_1.generateAccessToken)(updatedUser);
+        const data = (0, superjson_1.serialize)(updatedUser).json;
         res.json(data);
     });
 });

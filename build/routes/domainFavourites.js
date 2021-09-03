@@ -16,11 +16,11 @@ const express_1 = require("express");
 const superjson_1 = require("superjson");
 const jwt_1 = require("../lib/jwt");
 const primaClient_1 = __importDefault(require("../lib/primaClient"));
-const router = express_1.Router();
+const router = (0, express_1.Router)();
 exports.default = router;
 router.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         try {
             const data = yield primaClient_1.default.domain.findMany({
                 where: {
@@ -32,7 +32,7 @@ router.get('/', function (req, res) {
                     }
                 }
             });
-            res.json(superjson_1.serialize(data).json);
+            res.json((0, superjson_1.serialize)(data).json);
         }
         catch (e) {
             console.log(e);
@@ -45,7 +45,7 @@ router.get('/', function (req, res) {
  */
 router.post('/favourites', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = jwt_1.getUserId(req);
+        const userId = (0, jwt_1.getUserId)(req);
         const { domainId } = req.body;
         try {
             const data = yield primaClient_1.default.domainFavourite.create({
@@ -54,7 +54,7 @@ router.post('/favourites', function (req, res) {
                     domainId: BigInt(domainId)
                 }
             });
-            res.json(superjson_1.serialize(data).json);
+            res.json((0, superjson_1.serialize)(data).json);
         }
         catch (e) {
             console.log(e);
